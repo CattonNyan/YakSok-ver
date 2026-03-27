@@ -50,26 +50,46 @@ export default function DashboardClient({ schedules, logs: initialLogs, userName
       const existing = logMap.get(`${scheduleId}_${slot}`)
       if (existing) {
         const newTaken = !existing.taken
+        // Optimistic update: DB 응답 전에 UI를 즉시 반영
+        setLogs(prev => prev.map(l => l.id === existing.id ? { ...l, taken: newTaken } : l))
         const { error } = await supabase
           .from('medication_logs')
           .update({ taken: newTaken, taken_at: newTaken ? new Date().toISOString() : null })
           .eq('id', existing.id)
         if (error) {
+          // 실패 시 롤백
+          setLogs(prev => prev.map(l => l.id === existing.id ? { ...l, taken: !newTaken } : l))
           toast.error('복약 상태 변경에 실패했습니다.')
         } else {
-          setLogs(prev => prev.map(l => l.id === existing.id ? { ...l, taken: newTaken } : l))
           toast.success(newTaken ? '복약 완료!' : '복약 취소')
         }
       } else {
+        // 신규 로그: 임시 ID로 즉시 추가 후 서버 응답으로 교체
+        const tempId = `temp_${scheduleId}_${slot}`
+        const optimisticLog: MedicationLog = {
+          id: tempId,
+          user_id: userId,
+          schedule_id: scheduleId,
+          medication_id: medicationId,
+          log_date: today,
+          time_slot: slot,
+          taken: true,
+          taken_at: new Date().toISOString(),
+        }
+        setLogs(prev => [...prev, optimisticLog])
         const { data, error } = await supabase
           .from('medication_logs')
           .insert({ user_id: userId, schedule_id: scheduleId, medication_id: medicationId,
             log_date: today, time_slot: slot, taken: true, taken_at: new Date().toISOString() })
-          .select().single()
+          .select('id,user_id,schedule_id,medication_id,log_date,time_slot,taken,taken_at')
+          .single()
         if (error) {
+          // 실패 시 임시 항목 제거
+          setLogs(prev => prev.filter(l => l.id !== tempId))
           toast.error('복약 기록에 실패했습니다.')
         } else if (data) {
-          setLogs(prev => [...prev, data])
+          // 임시 ID를 서버에서 발급된 실제 ID로 교체
+          setLogs(prev => prev.map(l => l.id === tempId ? data : l))
           toast.success('복약 완료!')
         }
       }

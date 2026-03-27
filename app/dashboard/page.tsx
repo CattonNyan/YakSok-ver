@@ -8,7 +8,10 @@ export default async function DashboardPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  const today = format(new Date(), 'yyyy-MM-dd')
+  // 서버가 UTC 환경일 때 한국 시간(KST, UTC+9) 기준 날짜를 사용
+  const now = new Date()
+  const kstDate = new Date(now.getTime() + 9 * 60 * 60 * 1000)
+  const today = kstDate.toISOString().split('T')[0]
 
   const [
     { data: schedules },
@@ -17,7 +20,7 @@ export default async function DashboardPage() {
   ] = await Promise.all([
     supabase
       .from('schedules')
-      .select(`*, medication:medications(*)`)
+      .select(`id,user_id,medication_id,start_date,end_date,time_slots,dosage,is_active,created_at,medication:medications(id,item_name,entp_name)`)
       .eq('user_id', user.id)
       .eq('is_active', true)
       .lte('start_date', today)
@@ -25,7 +28,7 @@ export default async function DashboardPage() {
 
     supabase
       .from('medication_logs')
-      .select('*')
+      .select('id,user_id,schedule_id,medication_id,log_date,time_slot,taken,taken_at')
       .eq('user_id', user.id)
       .eq('log_date', today),
 

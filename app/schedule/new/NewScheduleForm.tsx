@@ -24,7 +24,11 @@ export default function NewScheduleForm() {
   const [loadingMed, setLoadingMed] = useState(!!medId)
 
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>(['morning'])
-  const [startDate, setStartDate] = useState<string>(new Date().toISOString().split('T')[0])
+  const [startDate, setStartDate] = useState<string>(() => {
+    // toISOString()은 UTC 기준이므로 로컬 날짜를 직접 포매팅
+    const d = new Date()
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  })
   const [endDate, setEndDate] = useState<string>('')
   const [useEndDate, setUseEndDate] = useState(false)
   const [dosage, setDosage] = useState('')
@@ -36,11 +40,12 @@ export default function NewScheduleForm() {
     const supabase = createClient()
     supabase
       .from('medications')
-      .select('*')
+      .select('id,item_seq,item_name,entp_name,image_url,class_name,efficacy,usage_info,caution,side_effect,interaction_info,drug_shape,color_class1,color_class2,print_front,print_back,mark_code_front,mark_code_back,form_code_name,chart,created_at')
       .eq('id', medId)
       .single()
-      .then(({ data }) => {
-        if (data) setMedication(data)
+      .then(({ data, error }) => {
+        if (error) toast.error('약물 정보를 불러올 수 없습니다')
+        else if (data) setMedication(data)
         setLoadingMed(false)
       })
   }, [medId])
@@ -61,7 +66,11 @@ export default function NewScheduleForm() {
       toast.error('복용 시간대를 하나 이상 선택해주세요')
       return
     }
-    if (useEndDate && endDate && endDate < startDate) {
+    if (useEndDate && !endDate) {
+      toast.error('종료일을 선택해주세요')
+      return
+    }
+    if (useEndDate && endDate < startDate) {
       toast.error('종료일은 시작일 이후여야 합니다')
       return
     }
@@ -185,7 +194,11 @@ export default function NewScheduleForm() {
           <div>
             <label className="flex items-center gap-2 cursor-pointer mb-2">
               <div
-                onClick={() => setUseEndDate(v => !v)}
+                onClick={() => {
+                  const next = !useEndDate
+                  setUseEndDate(next)
+                  if (next && !endDate) setEndDate(startDate)
+                }}
                 className={`w-10 h-6 rounded-full transition-colors relative ${useEndDate ? 'bg-mint-500' : 'bg-sage-200'}`}>
                 <div className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${useEndDate ? 'translate-x-5' : 'translate-x-1'}`} />
               </div>

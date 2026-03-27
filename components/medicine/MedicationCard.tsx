@@ -1,23 +1,57 @@
 'use client'
 import { useState } from 'react'
-import { ChevronDown, ChevronUp, Plus, ExternalLink } from 'lucide-react'
+import { ChevronDown, ChevronUp, Plus, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import type { Medication } from '@/types'
-import clsx from 'clsx'
 
 interface Props {
   medication: Medication
   showAddButton?: boolean
-  compact?: boolean
 }
 
-export default function MedicationCard({ medication, showAddButton, compact }: Props) {
+function ShapeBadge({ label, value }: { label: string; value?: string }) {
+  if (!value) return null
+  return (
+    <span className="inline-flex items-center gap-1 text-xs bg-sage-50 text-sage-600 px-2 py-0.5 rounded-full border border-sage-200">
+      <span className="text-sage-400">{label}</span> {value}
+    </span>
+  )
+}
+
+export default function MedicationCard({ medication: initialMed, showAddButton }: Props) {
   const [expanded, setExpanded] = useState(false)
+  const [medication, setMedication] = useState<Medication>(initialMed)
+  const [detailState, setDetailState] = useState<'idle' | 'loading' | 'done' | 'none'>('idle')
+
+  const hasShapeInfo =
+    medication.drug_shape || medication.color_class1 || medication.form_code_name ||
+    medication.print_front || medication.print_back || medication.mark_code_front || medication.mark_code_back
+
+  const handleExpand = async () => {
+    const next = !expanded
+    setExpanded(next)
+
+    if (next && detailState === 'idle' && !medication.usage_info) {
+      setDetailState('loading')
+      try {
+        const res = await fetch(`/api/medications/detail?id=${medication.id}`)
+        const data = await res.json()
+        if (data.medication) setMedication(data.medication)
+        setDetailState(data.hasDetail ? 'done' : 'none')
+      } catch {
+        setDetailState('none')
+      }
+    }
+  }
+
+  const markText = [medication.print_front, medication.print_back, medication.mark_code_front, medication.mark_code_back]
+    .filter(Boolean).join(' / ')
+
+  const colorText = [medication.color_class1, medication.color_class2].filter(Boolean).join(' + ')
 
   return (
     <div className="card hover:shadow-md transition-shadow">
       <div className="flex items-start gap-3">
-        {/* 약 이미지 */}
         <div className="w-14 h-14 rounded-xl bg-sage-100 flex items-center justify-center shrink-0 overflow-hidden">
           {medication.image_url ? (
             <img src={medication.image_url} alt={medication.item_name} className="w-full h-full object-cover" />
@@ -46,14 +80,22 @@ export default function MedicationCard({ medication, showAddButton, compact }: P
                   <Plus className="w-4 h-4" />
                 </Link>
               )}
-              <button onClick={() => setExpanded(!expanded)}
+              <button onClick={handleExpand}
                 className="p-1.5 text-sage-400 hover:text-sage-600 rounded-lg hover:bg-sage-50 transition-colors">
                 {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
               </button>
             </div>
           </div>
 
-          {/* 효능 미리보기 */}
+          {hasShapeInfo && (
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              <ShapeBadge label="모양" value={medication.drug_shape} />
+              <ShapeBadge label="색상" value={colorText || undefined} />
+              <ShapeBadge label="제형" value={medication.form_code_name} />
+              {markText && <ShapeBadge label="각인" value={markText} />}
+            </div>
+          )}
+
           {!expanded && medication.efficacy && (
             <p className="text-xs text-sage-500 mt-2 line-clamp-2 leading-relaxed">
               {medication.efficacy}
@@ -62,9 +104,19 @@ export default function MedicationCard({ medication, showAddButton, compact }: P
         </div>
       </div>
 
-      {/* 상세 정보 */}
       {expanded && (
         <div className="mt-4 pt-4 border-t border-sage-100 space-y-3">
+          {detailState === 'loading' && (
+            <div className="flex items-center gap-2 py-3 text-sage-400">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span className="text-xs">상세 정보를 불러오는 중...</span>
+            </div>
+          )}
+
+          {detailState === 'none' && !medication.efficacy && (
+            <p className="text-xs text-sage-400 py-2">이 약품의 상세 정보는 제공되지 않습니다.</p>
+          )}
+
           {[
             { label: '효능·효과', content: medication.efficacy },
             { label: '용법·용량', content: medication.usage_info },
@@ -74,11 +126,16 @@ export default function MedicationCard({ medication, showAddButton, compact }: P
           ].filter(i => i.content).map(({ label, content }) => (
             <div key={label}>
               <p className="text-xs font-semibold text-sage-700 mb-1">{label}</p>
-              <p className="text-xs text-sage-600 leading-relaxed whitespace-pre-line">
-                {content}
-              </p>
+              <p className="text-xs text-sage-600 leading-relaxed whitespace-pre-line">{content}</p>
             </div>
           ))}
+
+          {medication.chart && (
+            <div>
+              <p className="text-xs font-semibold text-sage-700 mb-1">성상</p>
+              <p className="text-xs text-sage-600 leading-relaxed">{medication.chart}</p>
+            </div>
+          )}
 
           <div className="flex items-center justify-between pt-2">
             <p className="text-xs text-sage-400">⚠️ 참고용 정보이며 의료 진단을 대체하지 않습니다</p>

@@ -11,7 +11,7 @@ export default async function SchedulePage() {
 
   const { data: schedules } = await supabase
     .from('schedules')
-    .select(`*, medication:medications(*)`)
+    .select(`id,user_id,medication_id,start_date,end_date,time_slots,dosage,memo,is_active,created_at,medication:medications(id,item_name,entp_name,image_url)`)
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
 

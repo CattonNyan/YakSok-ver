@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
 import { Trash2, ToggleLeft, ToggleRight, Sun, Coffee, Sunset, Moon, X, Check } from 'lucide-react'
-import type { Schedule, TimeSlot } from '@/types'
+import type { Schedule, TimeSlot, Medication } from '@/types'
 import clsx from 'clsx'
 
 const SLOT_LABELS: Record<TimeSlot, { label: string; icon: React.ElementType }> = {
@@ -14,7 +14,7 @@ const SLOT_LABELS: Record<TimeSlot, { label: string; icon: React.ElementType }> 
 }
 
 export default function ScheduleList({ schedules: initial }: {
-  schedules: (Schedule & { medication: any })[]
+  schedules: (Schedule & { medication: Medication | null })[]
 }) {
   const supabase = createClient()
   const [schedules, setSchedules] = useState(initial)

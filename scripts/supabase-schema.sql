@@ -11,7 +11,7 @@ create table if not exists public.profiles (
   avatar_url text,
   provider text default 'email', -- email | kakao | google | naver
   created_at timestamptz default now(),
-  updated_at timestamptz default now()Q
+  updated_at timestamptz default now()
 );
 
 -- 2. 의약품 정보 (식약처 API 캐시 + 사용자 등록)
@@ -112,17 +112,72 @@ create policy "본인 채팅 수정" on public.chat_histories for update using (
 -- medications & drug_interactions: 모두 읽기 가능, 인증 사용자 캐시 저장 가능
 alter table public.medications enable row level security;
 create policy "의약품 전체 조회" on public.medications for select using (true);
-create policy "의약품 캐시 저장" on public.medications for insert with check (true);
-create policy "의약품 캐시 갱신" on public.medications for update using (true);
+create policy "의약품 캐시 저장" on public.medications for insert with check (auth.uid() is not null);
+create policy "의약품 캐시 갱신" on public.medications for update using (auth.uid() is not null);
 
 alter table public.drug_interactions enable row level security;
 create policy "상호작용 전체 조회" on public.drug_interactions for select using (true);
 
 -- =============================================
+-- 낱알식별 컬럼 추가 마이그레이션
+-- (이미 medications 테이블이 있는 경우 이 블록만 실행)
+-- =============================================
+
+alter table public.medications
+  add column if not exists drug_shape      text,   -- 모양: 원형, 타원형, 장방형 등
+  add column if not exists color_class1   text,   -- 주 색상: 하양, 노랑, 분홍 등
+  add column if not exists color_class2   text,   -- 보조 색상 (투톤)
+  add column if not exists print_front    text,   -- 앞면 인쇄 문자
+  add column if not exists print_back     text,   -- 뒷면 인쇄 문자
+  add column if not exists mark_code_front text,  -- 앞면 각인
+  add column if not exists mark_code_back  text,  -- 뒷면 각인
+  add column if not exists form_code_name text,   -- 제형: 필름코팅정, 캡슐제 등
+  add column if not exists chart          text;   -- 성상 설명
+
+-- 모양 검색 성능 인덱스
+create index if not exists idx_medications_drug_shape    on public.medications(drug_shape);
+create index if not exists idx_medications_color_class1  on public.medications(color_class1);
+create index if not exists idx_medications_print_front   on public.medications(print_front);
+create index if not exists idx_medications_print_back    on public.medications(print_back);
+create index if not exists idx_medications_form_code     on public.medications(form_code_name);
+
+-- =============================================
+-- 성능 인덱스 추가
+-- =============================================
+
+-- medications: 이름 검색(ilike %q%) 속도 향상을 위한 trigram 인덱스
+-- pg_trgm 익스텐션이 없으면 아래 두 줄을 먼저 실행:
+--   create extension if not exists pg_trgm;
+create index if not exists idx_medications_item_name_trgm
+  on public.medications using gin (item_name gin_trgm_ops);
+
+-- medications: 캐시 TTL 판단에 쓰이는 created_at 범위 조회
+create index if not exists idx_medications_created_at
+  on public.medications(created_at);
+
+-- schedules: user_id 필터 (RLS + 조회 모두 사용)
+create index if not exists idx_schedules_user_id
+  on public.schedules(user_id);
+
+-- schedules: 대시보드의 is_active + start_date/end_date 복합 조건
+create index if not exists idx_schedules_user_active
+  on public.schedules(user_id, is_active, start_date);
+
+-- medication_logs: 대시보드·달력의 user_id + log_date 범위 조회 (가장 빈번한 쿼리)
+create index if not exists idx_medication_logs_user_date
+  on public.medication_logs(user_id, log_date);
+
+-- profiles: id PK 이외 추가 인덱스 불필요 (PK가 이미 인덱스)
+
+-- =============================================
 -- 자동 프로필 생성 트리거
 -- =============================================
 create or replace function public.handle_new_user()
-returns trigger as $$
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
 begin
   insert into public.profiles (id, email, name, avatar_url, provider)
   values (
@@ -134,7 +189,7 @@ begin
   );
   return new;
 end;
-$$ language plpgsql security definer;
+$$;
 
 create or replace trigger on_auth_user_created
   after insert on auth.users

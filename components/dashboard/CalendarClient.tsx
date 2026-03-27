@@ -106,7 +106,7 @@ export default function CalendarClient({ dateMap, currentMonth }: Props) {
 
             return (
               <div key={day}
-                onClick={() => setSelectedDate(isSelected ? null : dateStr)}
+                onClick={() => setSelectedDate(prev => prev === dateStr ? null : dateStr)}
                 className={cn(
                   'aspect-square flex flex-col items-center justify-center rounded-xl text-sm transition-colors cursor-pointer hover:bg-sage-50',
                   isToday ? 'ring-2 ring-mint-400' : '',

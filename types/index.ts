@@ -28,6 +28,15 @@ export interface Medication {
   side_effect?: string
   interaction_info?: string
   image_url?: string
+  drug_shape?: string
+  color_class1?: string
+  color_class2?: string
+  print_front?: string
+  print_back?: string
+  mark_code_front?: string
+  mark_code_back?: string
+  form_code_name?: string
+  chart?: string
   created_at: string
 }
 
@@ -71,18 +80,4 @@ export interface ChatMessage {
   role: 'user' | 'assistant'
   content: string
   timestamp: string
-}
-
-export interface DashboardTimeSlot {
-  slot: TimeSlot
-  label: string
-  emoji: string
-  medications: Array<{
-    scheduleId: string
-    medicationId: string
-    medicationName: string
-    dosage?: string
-    taken: boolean
-    logId?: string
-  }>
 }

@@ -80,27 +80,32 @@ JSON 외의 다른 텍스트는 절대 포함하지 마세요.`,
     }
 
     const supabase = createClient()
-    const results = await Promise.all(
-      medicationNames
-        .filter((name: string) => name.length >= 2)
-        .map(async (name: string) => {
-          const { data: dbMed } = await supabase
-            .from('medications')
-            .select('*')
-            .ilike('item_name', `%${name}%`)
-            .limit(1)
-            .single()
+    const validNames = medicationNames.filter((name: string) => name.length >= 2)
 
-          if (dbMed) return dbMed
-          return {
-            id: crypto.randomUUID(),
-            item_name: name,
-            entp_name: null,
-            efficacy: null,
-            image_url: null,
-          }
-        })
-    )
+    // 이름별로 개별 쿼리(N+1)를 날리는 대신, OR 조건 한 번으로 일괄 조회
+    const orFilter = validNames
+      .map((name: string) => `item_name.ilike.%${name}%`)
+      .join(',')
+
+    const { data: dbMeds } = await supabase
+      .from('medications')
+      .select('id,item_seq,item_name,entp_name,class_name,efficacy,image_url,drug_shape,color_class1,color_class2,print_front,print_back,mark_code_front,mark_code_back,form_code_name,chart,created_at')
+      .or(orFilter)
+      .limit(validNames.length * 2)
+
+    const results = validNames.map((name: string) => {
+      const dbMed = dbMeds?.find(m =>
+        m.item_name.toLowerCase().includes(name.toLowerCase())
+      )
+      if (dbMed) return dbMed
+      return {
+        id: crypto.randomUUID(),
+        item_name: name,
+        entp_name: null,
+        efficacy: null,
+        image_url: null,
+      }
+    })
 
     return NextResponse.json({ candidates: results.filter(Boolean) })
 

@@ -10,10 +10,12 @@ export default async function CalendarPage({ searchParams }: { searchParams: { m
 
   const rawMonth = searchParams.month ?? ''
 
-  // BUG-08: monthStr 파라미터 검증 — yyyy-MM 형식 + 유효 날짜 여부 확인
+  // monthStr 파라미터 검증 — yyyy-MM 형식 + 유효 날짜 여부 확인
+  // 기본값은 KST(UTC+9) 기준 현재 월
   const MONTH_REGEX = /^\d{4}-(?:0[1-9]|1[0-2])$/
   const isValidMonth = MONTH_REGEX.test(rawMonth) && isValid(new Date(rawMonth + '-01'))
-  const monthStr = isValidMonth ? rawMonth : format(new Date(), 'yyyy-MM')
+  const kstNow = new Date(Date.now() + 9 * 60 * 60 * 1000)
+  const monthStr = isValidMonth ? rawMonth : kstNow.toISOString().slice(0, 7)
 
   const monthDate = new Date(monthStr + '-01')
   const start = format(startOfMonth(monthDate), 'yyyy-MM-dd')

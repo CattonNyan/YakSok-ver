@@ -77,6 +77,8 @@ async function fetchFromEyakeunyyo(q: string, apiKey: string) {
     }))
 }
 
+const SEARCH_COLUMNS = 'id,item_seq,item_name,entp_name,class_name,efficacy,usage_info,caution,side_effect,interaction_info,image_url,drug_shape,color_class1,color_class2,print_front,print_back,mark_code_front,mark_code_back,form_code_name,chart,created_at'
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const q = searchParams.get('q')?.trim()
@@ -84,12 +86,11 @@ export async function GET(request: Request) {
 
   const supabase = createClient()
 
-  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString()
+  // DB 캐시 확인 (medications는 장기 캐시이므로 TTL 없이 바로 반환)
   const { data: cached } = await supabase
     .from('medications')
-    .select('*')
+    .select(SEARCH_COLUMNS)
     .ilike('item_name', `%${q}%`)
-    .gte('created_at', oneHourAgo)
     .limit(10)
 
   if (cached && cached.length > 0) {
@@ -109,15 +110,21 @@ export async function GET(request: Request) {
   try {
     let mapped: any[] = []
 
+    // easyKey가 있으면 두 API를 병렬 호출한 뒤 e약은요 결과를 우선 사용
     if (easyKey) {
-      try {
-        mapped = await fetchFromEyakeunyyo(q, easyKey)
-      } catch (e) {
-        console.warn('e약은요 API 실패, 허가정보 API로 폴백:', e)
-      }
-    }
+      const [easyResult, hukaResult] = await Promise.allSettled([
+        fetchFromEyakeunyyo(q, easyKey),
+        fetchFromHukajeongbo(q, primaryKey),
+      ])
 
-    if (mapped.length === 0) {
+      if (easyResult.status === 'fulfilled' && easyResult.value.length > 0) {
+        mapped = easyResult.value
+      } else if (hukaResult.status === 'fulfilled' && hukaResult.value.length > 0) {
+        mapped = hukaResult.value
+      } else if (easyResult.status === 'rejected') {
+        console.warn('e약은요 API 실패, 허가정보 API로 폴백:', easyResult.reason)
+      }
+    } else {
       mapped = await fetchFromHukajeongbo(q, primaryKey)
     }
 
@@ -125,20 +132,18 @@ export async function GET(request: Request) {
       return NextResponse.json({ items: [] })
     }
 
+    // upsert 후 item_seq IN [...] 으로 DB ID 포함 결과 조회 (ilike보다 빠르고 id 필드 보장)
     const toUpsert = mapped.filter(m => m.item_seq)
     if (toUpsert.length > 0) {
-      await supabase
-        .from('medications')
-        .upsert(toUpsert, { onConflict: 'item_seq', ignoreDuplicates: true })
+      await supabase.from('medications').upsert(toUpsert, { onConflict: 'item_seq' })
+      const itemSeqs = toUpsert.map((m: any) => m.item_seq)
+      const { data: saved } = await supabase.from('medications').select(SEARCH_COLUMNS).in('item_seq', itemSeqs)
+      if (saved && saved.length > 0) {
+        return NextResponse.json({ items: saved })
+      }
     }
 
-    const { data: fresh } = await supabase
-      .from('medications')
-      .select('*')
-      .ilike('item_name', `%${q}%`)
-      .limit(10)
-
-    return NextResponse.json({ items: fresh?.length ? fresh : mapped })
+    return NextResponse.json({ items: mapped })
 
   } catch (error: any) {
     console.error('식약처 API 오류:', error.message)
