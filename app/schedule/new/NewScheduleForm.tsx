@@ -80,6 +80,12 @@ export default function NewScheduleForm() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { toast.error('로그인이 필요합니다'); setSaving(false); return }
 
+    // profiles 행이 없으면 FK 위반 방지 — 트리거 누락/기존 유저 대비
+    await supabase.from('profiles').upsert(
+      { id: user.id, email: user.email ?? '' },
+      { onConflict: 'id', ignoreDuplicates: true }
+    )
+
     const { error } = await supabase.from('schedules').insert({
       user_id: user.id,
       medication_id: medication.id,
