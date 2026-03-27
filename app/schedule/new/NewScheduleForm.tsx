@@ -104,6 +104,7 @@ export default function NewScheduleForm() {
     }
 
     toast.success('복약 일정이 등록됐습니다!')
+    router.refresh()
     router.push('/schedule')
   }
 

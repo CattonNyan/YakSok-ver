@@ -27,7 +27,8 @@ export default async function SchedulePage() {
         </Link>
       </div>
 
-      <ScheduleList schedules={schedules ?? []} />
+      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+      <ScheduleList schedules={(schedules ?? []) as any} />
     </div>
   )
 }

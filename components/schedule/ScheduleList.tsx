@@ -13,10 +13,10 @@ const SLOT_LABELS: Record<TimeSlot, { label: string; icon: React.ElementType }> 
   bedtime: { label: '취침 전', icon: Moon },
 }
 
-type ScheduleWithMed = Schedule & { medication: Pick<Medication, 'item_name' | 'entp_name' | 'image_url'>[] | null }
+type ScheduleWithMed = Schedule & { medication: Pick<Medication, 'item_name' | 'entp_name' | 'image_url'> | null }
 
 function getMed(s: ScheduleWithMed) {
-  return s.medication?.[0] ?? null
+  return s.medication ?? null
 }
 
 export default function ScheduleList({ schedules: initial }: {
