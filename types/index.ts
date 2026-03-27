@@ -44,7 +44,6 @@ export interface Schedule {
   id: string
   user_id: string
   medication_id: string
-  medication?: Medication
   start_date: string
   end_date?: string
   time_slots: TimeSlot[]

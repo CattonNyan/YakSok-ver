@@ -13,8 +13,14 @@ const SLOT_LABELS: Record<TimeSlot, { label: string; icon: React.ElementType }> 
   bedtime: { label: '취침 전', icon: Moon },
 }
 
+type ScheduleWithMed = Schedule & { medication: Pick<Medication, 'item_name' | 'entp_name' | 'image_url'>[] | null }
+
+function getMed(s: ScheduleWithMed) {
+  return s.medication?.[0] ?? null
+}
+
 export default function ScheduleList({ schedules: initial }: {
-  schedules: (Schedule & { medication: Medication | null })[]
+  schedules: ScheduleWithMed[]
 }) {
   const supabase = createClient()
   const [schedules, setSchedules] = useState(initial)
@@ -63,8 +69,8 @@ export default function ScheduleList({ schedules: initial }: {
                 <span className="text-xl">💊</span>
               </div>
               <div className="min-w-0">
-                <p className="font-semibold text-sage-900 truncate">{s.medication?.item_name}</p>
-                <p className="text-xs text-sage-500 mt-0.5">{s.medication?.entp_name}</p>
+                <p className="font-semibold text-sage-900 truncate">{getMed(s)?.item_name}</p>
+                <p className="text-xs text-sage-500 mt-0.5">{getMed(s)?.entp_name}</p>
                 <div className="flex flex-wrap gap-1 mt-2">
                   {s.time_slots.map((slot: TimeSlot) => {
                     const { label, icon: Icon } = SLOT_LABELS[slot]

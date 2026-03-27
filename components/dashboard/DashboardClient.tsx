@@ -17,12 +17,18 @@ const TIME_SLOTS: { slot: TimeSlot; label: string; icon: React.ElementType; colo
   { slot: 'bedtime',  label: '취침 전', icon: Moon,    color: 'text-blue-500 bg-blue-50' },
 ]
 
+type MedicationInfo = { item_name: string; entp_name?: string }
+
 interface Props {
-  schedules: (Schedule & { medication: { item_name: string; entp_name?: string } })[]
+  schedules: (Schedule & { medication: MedicationInfo[] | null })[]
   logs: MedicationLog[]
   userName: string
   today: string
   userId: string
+}
+
+function getMedication(s: Props['schedules'][number]): MedicationInfo | null {
+  return s.medication?.[0] ?? null
 }
 
 export default function DashboardClient({ schedules, logs: initialLogs, userName, today, userId }: Props) {
@@ -169,7 +175,7 @@ export default function DashboardClient({ schedules, logs: initialLogs, userName
                     <button key={s.id}
                       onClick={() => toggleLog(s.id, s.medication_id, slot)}
                       disabled={isPending}
-                      aria-label={`${s.medication?.item_name} ${taken ? '복약 완료 — 취소하려면 탭하세요' : '복약하기'}`}
+                      aria-label={`${getMedication(s)?.item_name} ${taken ? '복약 완료 — 취소하려면 탭하세요' : '복약하기'}`}
                       aria-pressed={taken}
                       className={cn(
                         'w-full flex items-center gap-3 p-3 rounded-xl border transition-all text-left',
@@ -182,7 +188,7 @@ export default function DashboardClient({ schedules, logs: initialLogs, userName
                         : <Circle className="w-6 h-6 text-sage-300 shrink-0" aria-hidden="true" />}
                       <div className="flex-1 min-w-0">
                         <p className={cn('font-medium text-sm truncate', taken ? 'text-mint-700 line-through' : 'text-sage-800')}>
-                          {s.medication?.item_name}
+                          {getMedication(s)?.item_name}
                         </p>
                         {s.dosage && <p className="text-xs text-sage-400 mt-0.5">{s.dosage}</p>}
                       </div>
