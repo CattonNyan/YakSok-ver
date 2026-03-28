@@ -20,7 +20,7 @@ const TIME_SLOTS: { slot: TimeSlot; label: string; icon: React.ElementType; colo
 type MedicationInfo = { item_name: string; entp_name?: string }
 
 interface Props {
-  schedules: (Schedule & { medication: MedicationInfo[] | null })[]
+  schedules: (Schedule & { medication: MedicationInfo | null })[]
   logs: MedicationLog[]
   userName: string
   today: string
@@ -28,7 +28,7 @@ interface Props {
 }
 
 function getMedication(s: Props['schedules'][number]): MedicationInfo | null {
-  return s.medication?.[0] ?? null
+  return s.medication ?? null
 }
 
 export default function DashboardClient({ schedules, logs: initialLogs, userName, today, userId }: Props) {

@@ -39,9 +39,12 @@ export default async function DashboardPage() {
       .single(),
   ])
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const typedSchedules = (schedules ?? []) as any
+
   return (
     <DashboardClient
-      schedules={schedules ?? []}
+      schedules={typedSchedules}
       logs={logs ?? []}
       userName={profile?.name ?? ''}
       today={today}
