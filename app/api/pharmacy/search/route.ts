@@ -46,7 +46,7 @@ async function searchNaverGrid(
 
   const areas = await Promise.all(centers.map(c => getAreaQuery(c.lat, c.lng)))
 
-  const uniqueAreas = [...new Set(areas.map(a => `약국 ${a}`))]
+  const uniqueAreas = Array.from(new Set(areas.map(a => `약국 ${a}`)))
 
   const fetchQuery = (q: string) =>
     fetch(
