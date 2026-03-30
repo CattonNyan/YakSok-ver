@@ -3,11 +3,9 @@ import { redirect } from 'next/navigation'
 import DashboardClient from '@/components/dashboard/DashboardClient'
 
 export default async function DashboardPage() {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
-
-  // 서버가 UTC 환경일 때 한국 시간(KST, UTC+9) 기준 날짜를 사용
   const now = new Date()
   const kstDate = new Date(now.getTime() + 9 * 60 * 60 * 1000)
   const today = kstDate.toISOString().split('T')[0]

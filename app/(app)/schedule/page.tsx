@@ -5,7 +5,7 @@ import { Plus } from 'lucide-react'
 import ScheduleList from '@/components/schedule/ScheduleList'
 
 export default async function SchedulePage() {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 

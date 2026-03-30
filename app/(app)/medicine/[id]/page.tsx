@@ -3,12 +3,13 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Plus, AlertCircle } from 'lucide-react'
 
-export default async function MedicinePage({ params }: { params: { id: string } }) {
-  const supabase = createClient()
+export default async function MedicinePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const supabase = await createClient()
   const { data: med } = await supabase
     .from('medications')
     .select('*')
-    .eq('id', params.id)
+    .eq('id', id)
     .single()
 
   if (!med) notFound()

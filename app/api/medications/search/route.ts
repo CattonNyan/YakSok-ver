@@ -84,7 +84,7 @@ export async function GET(request: Request) {
   const q = searchParams.get('q')?.trim()
   if (!q) return NextResponse.json({ items: [] })
 
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const { data: cached } = await supabase
     .from('medications')

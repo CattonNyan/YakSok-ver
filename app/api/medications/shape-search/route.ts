@@ -17,7 +17,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
 
     let query = supabase
       .from('medications')

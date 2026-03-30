@@ -11,7 +11,7 @@ const PharmacyMapClient = dynamic(
 export const metadata = { title: '근처 약국 찾기 | 약속' }
 
 export default async function PharmacyMapPage() {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 

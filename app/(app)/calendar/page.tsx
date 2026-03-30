@@ -3,12 +3,13 @@ import { redirect } from 'next/navigation'
 import CalendarClient from '@/components/dashboard/CalendarClient'
 import { format, startOfMonth, endOfMonth, isValid } from 'date-fns'
 
-export default async function CalendarPage({ searchParams }: { searchParams: { month?: string } }) {
-  const supabase = createClient()
+export default async function CalendarPage({ searchParams }: { searchParams: Promise<{ month?: string }> }) {
+  const { month } = await searchParams
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  const rawMonth = searchParams.month ?? ''
+  const rawMonth = month ?? ''
 
   const MONTH_REGEX = /^\d{4}-(?:0[1-9]|1[0-2])$/
   const isValidMonth = MONTH_REGEX.test(rawMonth) && isValid(new Date(rawMonth + '-01'))

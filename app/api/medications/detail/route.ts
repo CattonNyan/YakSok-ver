@@ -8,7 +8,7 @@ export async function GET(request: Request) {
   const id = searchParams.get('id')
   if (!id) return NextResponse.json({ error: 'id 필요' }, { status: 400 })
 
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const { data: med } = await supabase
     .from('medications')

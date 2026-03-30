@@ -4,7 +4,7 @@ import InteractionClient from '@/components/medicine/InteractionClient'
 import type { Medication, DrugInteraction } from '@/types'
 
 export default async function InteractionPage() {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 

@@ -79,7 +79,7 @@ JSON 외의 다른 텍스트는 절대 포함하지 마세요.`,
       return NextResponse.json({ candidates: [] })
     }
 
-    const supabase = createClient()
+    const supabase = await createClient()
     const validNames = medicationNames.filter((name: string) => name.length >= 2)
 
     const orFilter = validNames
