@@ -52,7 +52,6 @@ export default function CalendarClient({ dateMap, currentMonth }: Props) {
         <p className="text-sm text-sage-500 mt-1">월별 복약 이행률을 확인하세요</p>
       </div>
 
-      {/* 이번 달 통계 */}
       <div className="grid grid-cols-3 gap-3">
         <div className="card text-center">
           <p className="text-2xl font-bold text-mint-600">{monthRate}%</p>
@@ -68,9 +67,7 @@ export default function CalendarClient({ dateMap, currentMonth }: Props) {
         </div>
       </div>
 
-      {/* 달력 */}
       <div className="card">
-        {/* 월 네비게이션 */}
         <div className="flex items-center justify-between mb-4">
           <button onClick={() => router.push(`/calendar?month=${prevMonth}`)}
             className="p-2 hover:bg-sage-50 rounded-lg transition-colors">
@@ -83,7 +80,6 @@ export default function CalendarClient({ dateMap, currentMonth }: Props) {
           </button>
         </div>
 
-        {/* 요일 헤더 */}
         <div className="grid grid-cols-7 mb-2">
           {DAYS.map((d, i) => (
             <div key={d} className={cn('text-center text-xs font-medium py-1',
@@ -92,7 +88,6 @@ export default function CalendarClient({ dateMap, currentMonth }: Props) {
           ))}
         </div>
 
-        {/* 날짜 */}
         <div className="grid grid-cols-7 gap-1">
           {Array.from({ length: firstDayOfWeek }).map((_, i) => <div key={`empty-${i}`} />)}
           {Array.from({ length: daysInMonth }).map((_, i) => {
@@ -125,7 +120,6 @@ export default function CalendarClient({ dateMap, currentMonth }: Props) {
         </div>
       </div>
 
-      {/* 날짜 상세 패널 */}
       {selectedDate && (() => {
         const day = dateMap[selectedDate]
         const label = format(new Date(selectedDate), 'M월 d일 (eee)', { locale: ko })
@@ -160,7 +154,6 @@ export default function CalendarClient({ dateMap, currentMonth }: Props) {
         )
       })()}
 
-      {/* 범례 */}
       <div className="flex items-center justify-center gap-5 text-xs text-sage-500">
         <div className="flex items-center gap-1.5">
           <div className="w-4 h-1.5 bg-mint-400 rounded-full" /> 100% 완료

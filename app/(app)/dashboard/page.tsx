@@ -1,7 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import DashboardClient from '@/components/dashboard/DashboardClient'
-import { format } from 'date-fns'
 
 export default async function DashboardPage() {
   const supabase = createClient()

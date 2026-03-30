@@ -59,7 +59,6 @@ export default function ChatPage() {
         <p className="text-sm text-sage-500 mt-1">약에 관한 궁금한 점을 물어보세요</p>
       </div>
 
-      {/* 메시지 영역 */}
       <div className="flex-1 overflow-y-auto space-y-4 pb-4">
         {messages.map((m) => (
           <div key={m.id} className={clsx('flex gap-3', m.role === 'user' && 'flex-row-reverse')}>
@@ -96,7 +95,6 @@ export default function ChatPage() {
         <div ref={bottomRef} />
       </div>
 
-      {/* 빠른 질문 */}
       {messages.length === 1 && (
         <div className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar">
           {QUICK.map(q => (
@@ -108,13 +106,11 @@ export default function ChatPage() {
         </div>
       )}
 
-      {/* 면책 고지 */}
       <div className="flex items-center gap-1.5 py-2">
         <AlertCircle className="w-3 h-3 text-sage-400 shrink-0" />
         <p className="text-xs text-sage-400">참고용 정보입니다. 의료 진단을 대체하지 않습니다.</p>
       </div>
 
-      {/* 입력창 */}
       <div className="flex gap-2" role="form" aria-label="메시지 입력">
         <input
           value={input}

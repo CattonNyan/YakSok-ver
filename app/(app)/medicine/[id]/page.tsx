@@ -30,7 +30,6 @@ export default async function MedicinePage({ params }: { params: { id: string } 
         <h1 className="text-xl font-bold text-sage-900 truncate">{med.item_name}</h1>
       </div>
 
-      {/* 약 기본 정보 */}
       <div className="card flex items-start gap-4">
         <div className="w-20 h-20 bg-sage-100 rounded-xl flex items-center justify-center shrink-0 overflow-hidden">
           {med.image_url
@@ -52,7 +51,6 @@ export default async function MedicinePage({ params }: { params: { id: string } 
         </div>
       </div>
 
-      {/* 상세 섹션 */}
       {sections.map(({ label, content }) => (
         <div key={label} className="card">
           <h3 className="font-semibold text-sage-800 mb-3 flex items-center gap-2">
@@ -63,7 +61,6 @@ export default async function MedicinePage({ params }: { params: { id: string } 
         </div>
       ))}
 
-      {/* 면책 고지 */}
       <div className="flex items-start gap-2 p-4 bg-amber-50 border border-amber-200 rounded-xl">
         <AlertCircle className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
         <p className="text-xs text-amber-700 leading-relaxed">

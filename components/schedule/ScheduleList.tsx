@@ -24,7 +24,6 @@ export default function ScheduleList({ schedules: initial }: {
 }) {
   const supabase = createClient()
   const [schedules, setSchedules] = useState(initial)
-  // UX-05: window.confirm() 대신 인라인 확인 UI 상태 관리
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
 
   const toggleActive = async (id: string, current: boolean) => {
@@ -89,7 +88,6 @@ export default function ScheduleList({ schedules: initial }: {
             </div>
 
             <div className="flex items-center gap-1 shrink-0">
-              {/* 일정 활성/비활성 토글 */}
               <button
                 onClick={() => toggleActive(s.id, s.is_active)}
                 aria-label={s.is_active ? '일정 중단' : '일정 재개'}
@@ -99,7 +97,6 @@ export default function ScheduleList({ schedules: initial }: {
                   : <ToggleLeft className="w-5 h-5" aria-hidden="true" />}
               </button>
 
-              {/* UX-05: 인라인 삭제 확인 UI */}
               {pendingDeleteId === s.id ? (
                 <div className="flex items-center gap-1 bg-red-50 border border-red-200 rounded-xl px-2 py-1">
                   <span className="text-xs text-red-600 font-medium whitespace-nowrap">삭제할까요?</span>

@@ -82,7 +82,6 @@ JSON 외의 다른 텍스트는 절대 포함하지 마세요.`,
     const supabase = createClient()
     const validNames = medicationNames.filter((name: string) => name.length >= 2)
 
-    // 이름별로 개별 쿼리(N+1)를 날리는 대신, OR 조건 한 번으로 일괄 조회
     const orFilter = validNames
       .map((name: string) => `item_name.ilike.%${name}%`)
       .join(',')

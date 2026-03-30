@@ -25,7 +25,6 @@ export default function NewScheduleForm() {
 
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>(['morning'])
   const [startDate, setStartDate] = useState<string>(() => {
-    // toISOString()은 UTC 기준이므로 로컬 날짜를 직접 포매팅
     const d = new Date()
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
   })
@@ -40,12 +39,12 @@ export default function NewScheduleForm() {
     const supabase = createClient()
     supabase
       .from('medications')
-      .select('id,item_seq,item_name,entp_name,image_url,class_name,efficacy,usage_info,caution,side_effect,interaction_info,drug_shape,color_class1,color_class2,print_front,print_back,mark_code_front,mark_code_back,form_code_name,chart,created_at')
+      .select('id,item_name,entp_name,image_url,class_name')
       .eq('id', medId)
       .single()
       .then(({ data, error }) => {
         if (error) toast.error('약물 정보를 불러올 수 없습니다')
-        else if (data) setMedication(data)
+        else if (data) setMedication(data as any)
         setLoadingMed(false)
       })
   }, [medId])
@@ -80,7 +79,6 @@ export default function NewScheduleForm() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { toast.error('로그인이 필요합니다'); setSaving(false); return }
 
-    // profiles 행이 없으면 FK 위반 방지 — 트리거 누락/기존 유저 대비
     await supabase.from('profiles').upsert(
       { id: user.id, email: user.email ?? '' },
       { onConflict: 'id', ignoreDuplicates: true }
@@ -110,7 +108,6 @@ export default function NewScheduleForm() {
 
   return (
     <div className="max-w-xl mx-auto space-y-5">
-      {/* 헤더 */}
       <div className="flex items-center gap-3">
         <Link href="/schedule" className="p-2 rounded-xl hover:bg-sage-100 transition-colors">
           <ArrowLeft className="w-5 h-5 text-sage-600" />
@@ -121,7 +118,6 @@ export default function NewScheduleForm() {
         </div>
       </div>
 
-      {/* 선택된 약 */}
       <div className="card">
         <p className="text-xs font-semibold text-sage-500 uppercase tracking-wide mb-3">선택된 약</p>
         {loadingMed ? (
@@ -151,7 +147,6 @@ export default function NewScheduleForm() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* 복용 시간대 */}
         <div className="card">
           <p className="text-xs font-semibold text-sage-500 uppercase tracking-wide mb-3">복용 시간대 <span className="text-red-400">*</span></p>
           <div className="grid grid-cols-2 gap-2">
@@ -176,7 +171,6 @@ export default function NewScheduleForm() {
           </div>
         </div>
 
-        {/* 복용량 */}
         <div className="card">
           <label className="text-xs font-semibold text-sage-500 uppercase tracking-wide mb-3 block">
             복용량 (선택)
@@ -190,7 +184,6 @@ export default function NewScheduleForm() {
           />
         </div>
 
-        {/* 복용 기간 */}
         <div className="card space-y-4">
           <p className="text-xs font-semibold text-sage-500 uppercase tracking-wide">복용 기간</p>
           <div>
@@ -220,7 +213,6 @@ export default function NewScheduleForm() {
           </div>
         </div>
 
-        {/* 메모 */}
         <div className="card">
           <label className="text-xs font-semibold text-sage-500 uppercase tracking-wide mb-3 block">
             메모 (선택)
@@ -234,7 +226,6 @@ export default function NewScheduleForm() {
           />
         </div>
 
-        {/* 저장 버튼 */}
         <button type="submit" disabled={saving || !medication || timeSlots.length === 0}
           className="btn-primary w-full flex items-center justify-center gap-2 py-3 disabled:opacity-50 disabled:cursor-not-allowed">
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}

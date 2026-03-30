@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { Toaster } from 'react-hot-toast'
+import NavigationProgress from '@/components/layout/NavigationProgress'
 
 export const metadata: Metadata = {
   title: '약속 — 스마트 복약 관리',
@@ -11,6 +12,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko">
+      <head>
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+      </head>
       <body>
         {children}
         <Toaster
@@ -19,6 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             style: { borderRadius: '12px', fontFamily: 'Pretendard Variable, sans-serif' },
           }}
         />
+        <NavigationProgress />
       </body>
     </html>
   )

@@ -2,7 +2,7 @@
 
 **AI 기반 스마트 복약 관리 서비스**
 
-약품 검색부터 복약 일정 관리, AI 상담까지 한 곳에서.
+약품 검색부터 복약 일정 관리, AI 상담, 근처 약국 찾기까지 한 곳에서.
 
 ---
 
@@ -11,12 +11,13 @@
 | 기능 | 설명 |
 |------|------|
 | 약 검색 | 약품명 텍스트 검색 또는 사진으로 AI 인식 |
-| 낱알식별 모양 검색 | 색상·모양·刻印(각인)으로 모르는 약 찾기 |
+| 낱알식별 모양 검색 | 색상·모양·각인으로 모르는 약 찾기 |
 | 복약 일정 | 시간대별(아침/점심/저녁/취침 전) 복약 일정 등록·관리 |
 | 오늘의 복약 | 오늘 먹을 약을 한눈에 확인하고 체크 |
 | 복약 달력 | 월별 복약 이행률 캘린더 뷰 |
 | 약물 상호작용 | 복용 중인 약들의 상호작용 자동 검사 |
 | AI 상담 | 복약 방법, 부작용 등 약 관련 질문 채팅 상담 |
+| 근처 약국 찾기 | 현재 위치 기반 약국 지도 및 거리 표시 |
 
 ---
 
@@ -28,6 +29,7 @@
 | Backend | Supabase (PostgreSQL + Auth) |
 | AI | Groq — Llama 4 (채팅 상담, 이미지 인식) |
 | 의약품 데이터 | 식약처 공공데이터 API (e약은요, 낱알식별정보) |
+| 지도 | 네이버 지도 SDK + 네이버 지역 검색 API |
 | 배포 | Vercel |
 
 ---
@@ -59,8 +61,13 @@ cp .env.local.example .env.local
 | `MFDS_API_KEY` | 식약처 낱알식별 API 키 | [data.go.kr](https://www.data.go.kr) — "의약품 낱알식별 정보 서비스" |
 | `MFDS_EASY_API_KEY` | 식약처 e약은요 API 키 (선택) | [data.go.kr](https://www.data.go.kr) — "e약은요 서비스" |
 | `MFDS_GRAIN_API_KEY` | 식약처 낱알식별 모양 검색 키 (선택) | [data.go.kr](https://www.data.go.kr) — "의약품 낱알식별 정보 서비스" |
+| `NEXT_PUBLIC_NAVER_MAP_CLIENT_ID` | 네이버 지도 Client ID | [console.ncloud.com](https://console.ncloud.com) — Application 등록 후 "Maps" 선택 |
+| `NAVER_CLIENT_ID` | 네이버 검색 API Client ID | [developers.naver.com](https://developers.naver.com) — "지역" 검색 API 신청 |
+| `NAVER_CLIENT_SECRET` | 네이버 검색 API Client Secret | [developers.naver.com](https://developers.naver.com) |
 
 > `MFDS_EASY_API_KEY`와 `MFDS_GRAIN_API_KEY`는 선택 사항입니다. 없어도 기본 검색은 동작합니다.
+>
+> 네이버 관련 키는 근처 약국 찾기 기능에 사용됩니다. 없으면 해당 기능이 비활성화됩니다.
 
 ### 3. 데이터베이스 스키마 적용
 
@@ -83,21 +90,27 @@ yakssok/
 ├── app/
 │   ├── page.tsx                  # 랜딩 페이지
 │   ├── auth/                     # 로그인 · 회원가입
-│   ├── dashboard/                # 오늘의 복약 대시보드
-│   ├── search/                   # 약 검색 (텍스트 · 이미지 · 모양)
-│   ├── schedule/                 # 복약 일정 등록·관리
-│   ├── calendar/                 # 월별 복약 달력
-│   ├── interaction/              # 약물 상호작용 검사
-│   ├── chat/                     # AI 복약 상담
-│   └── api/
-│       ├── medications/
-│       │   ├── search/           # 텍스트 검색 + 식약처 API 캐싱
-│       │   ├── image-search/     # 이미지 → AI 약품명 추출
-│       │   ├── detail/           # 약품 상세 정보 (용법·부작용 등)
-│       │   └── shape-search/     # 낱알식별 모양 검색
-│       ├── interactions/check/   # 약물 상호작용 조회
-│       ├── chat/                 # AI 챗봇 (Groq Llama)
-│       └── auth/logout/          # 로그아웃
+│   └── (app)/
+│       ├── dashboard/            # 오늘의 복약 대시보드
+│       ├── search/               # 약 검색 (텍스트 · 이미지 · 모양)
+│       ├── schedule/             # 복약 일정 등록·관리
+│       ├── calendar/             # 월별 복약 달력
+│       ├── interaction/          # 약물 상호작용 검사
+│       ├── chat/                 # AI 복약 상담
+│       ├── pharmacy-map/         # 근처 약국 지도
+│       ├── medicine/[id]/        # 약품 상세 페이지
+│       └── profile/              # 사용자 프로필
+├── app/api/
+│   ├── medications/
+│   │   ├── search/               # 텍스트 검색 + 식약처 API 캐싱
+│   │   ├── image-search/         # 이미지 → AI 약품명 추출
+│   │   ├── detail/               # 약품 상세 정보 (용법·부작용 등)
+│   │   └── shape-search/         # 낱알식별 모양 검색
+│   ├── pharmacy/search/          # 네이버 API 기반 약국 검색
+│   ├── geocode/                  # 주소 → 좌표 변환 (Nominatim)
+│   ├── interactions/check/       # 약물 상호작용 조회
+│   ├── chat/                     # AI 챗봇 (Groq Llama)
+│   └── auth/logout/              # 로그아웃
 ├── components/                   # 재사용 UI 컴포넌트
 ├── lib/supabase/                 # Supabase 클라이언트 (server / client)
 ├── types/                        # TypeScript 타입 정의

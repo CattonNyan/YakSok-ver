@@ -172,7 +172,6 @@ export default function ProfilePage() {
         <p className="text-sm text-sage-500 mt-1">개인 정보를 관리하세요</p>
       </div>
 
-      {/* 프로필 사진 */}
       <div className="card flex flex-col items-center py-6 gap-4">
         <div className="relative">
           <div className="w-24 h-24 rounded-full bg-sage-100 overflow-hidden flex items-center justify-center">
@@ -192,7 +191,6 @@ export default function ProfilePage() {
         <p className="text-xs text-sage-400">JPG, PNG · 최대 2MB</p>
       </div>
 
-      {/* 기본 정보 */}
       <div className="card space-y-4">
         <h2 className="font-semibold text-sage-800">기본 정보</h2>
 
@@ -246,7 +244,6 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* 질환/건강 상태 */}
       <div className="card space-y-4">
         <h2 className="font-semibold text-sage-800">복용 중인 질환 / 건강 상태</h2>
         <div className="flex flex-wrap gap-2">
@@ -262,7 +259,6 @@ export default function ProfilePage() {
           ))}
         </div>
 
-        {/* 직접 입력 */}
         <div className="flex gap-2">
           <input value={customCondition} onChange={e => setCustomCondition(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && addCustomCondition()}
@@ -273,7 +269,6 @@ export default function ProfilePage() {
           </button>
         </div>
 
-        {/* 직접 입력한 항목 */}
         {conditions.filter(c => !CONDITIONS.includes(c)).length > 0 && (
           <div className="flex flex-wrap gap-2">
             {conditions.filter(c => !CONDITIONS.includes(c)).map(c => (

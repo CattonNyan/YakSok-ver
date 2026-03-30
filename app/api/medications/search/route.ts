@@ -86,7 +86,6 @@ export async function GET(request: Request) {
 
   const supabase = createClient()
 
-  // DB 캐시 확인 (medications는 장기 캐시이므로 TTL 없이 바로 반환)
   const { data: cached } = await supabase
     .from('medications')
     .select(SEARCH_COLUMNS)
@@ -110,7 +109,6 @@ export async function GET(request: Request) {
   try {
     let mapped: any[] = []
 
-    // easyKey가 있으면 두 API를 병렬 호출한 뒤 e약은요 결과를 우선 사용
     if (easyKey) {
       const [easyResult, hukaResult] = await Promise.allSettled([
         fetchFromEyakeunyyo(q, easyKey),
@@ -121,8 +119,6 @@ export async function GET(request: Request) {
         mapped = easyResult.value
       } else if (hukaResult.status === 'fulfilled' && hukaResult.value.length > 0) {
         mapped = hukaResult.value
-      } else if (easyResult.status === 'rejected') {
-        console.warn('e약은요 API 실패, 허가정보 API로 폴백:', easyResult.reason)
       }
     } else {
       mapped = await fetchFromHukajeongbo(q, primaryKey)
@@ -132,7 +128,6 @@ export async function GET(request: Request) {
       return NextResponse.json({ items: [] })
     }
 
-    // upsert 후 item_seq IN [...] 으로 DB ID 포함 결과 조회 (ilike보다 빠르고 id 필드 보장)
     const toUpsert = mapped.filter(m => m.item_seq)
     if (toUpsert.length > 0) {
       await supabase.from('medications').upsert(toUpsert, { onConflict: 'item_seq' })

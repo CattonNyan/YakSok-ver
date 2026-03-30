@@ -10,8 +10,6 @@ export default async function CalendarPage({ searchParams }: { searchParams: { m
 
   const rawMonth = searchParams.month ?? ''
 
-  // monthStr 파라미터 검증 — yyyy-MM 형식 + 유효 날짜 여부 확인
-  // 기본값은 KST(UTC+9) 기준 현재 월
   const MONTH_REGEX = /^\d{4}-(?:0[1-9]|1[0-2])$/
   const isValidMonth = MONTH_REGEX.test(rawMonth) && isValid(new Date(rawMonth + '-01'))
   const kstNow = new Date(Date.now() + 9 * 60 * 60 * 1000)
@@ -28,7 +26,6 @@ export default async function CalendarPage({ searchParams }: { searchParams: { m
     .gte('log_date', start)
     .lte('log_date', end)
 
-  // 날짜별 완료율 + 상세 내역 계산
   const dateMap: Record<string, {
     total: number
     taken: number

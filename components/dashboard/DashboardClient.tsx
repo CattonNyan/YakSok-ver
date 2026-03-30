@@ -8,8 +8,6 @@ import { ko } from 'date-fns/locale'
 import type { Schedule, MedicationLog, TimeSlot } from '@/types'
 import { cn } from '@/lib/utils'
 
-const supabase = createClient()
-
 const TIME_SLOTS: { slot: TimeSlot; label: string; icon: React.ElementType; color: string }[] = [
   { slot: 'morning',  label: '아침',   icon: Sun,     color: 'text-amber-500 bg-amber-50' },
   { slot: 'lunch',    label: '점심',   icon: Coffee,  color: 'text-orange-500 bg-orange-50' },
@@ -34,6 +32,7 @@ function getMedication(s: Props['schedules'][number]): MedicationInfo | null {
 export default function DashboardClient({ schedules, logs: initialLogs, userName, today, userId }: Props) {
   const [logs, setLogs] = useState(initialLogs)
   const [isPending, startTransition] = useTransition()
+  const supabase = useMemo(() => createClient(), [])
 
   const logMap = useMemo(() => {
     const map = new Map<string, MedicationLog>()
@@ -56,21 +55,18 @@ export default function DashboardClient({ schedules, logs: initialLogs, userName
       const existing = logMap.get(`${scheduleId}_${slot}`)
       if (existing) {
         const newTaken = !existing.taken
-        // Optimistic update: DB 응답 전에 UI를 즉시 반영
         setLogs(prev => prev.map(l => l.id === existing.id ? { ...l, taken: newTaken } : l))
         const { error } = await supabase
           .from('medication_logs')
           .update({ taken: newTaken, taken_at: newTaken ? new Date().toISOString() : null })
           .eq('id', existing.id)
         if (error) {
-          // 실패 시 롤백
           setLogs(prev => prev.map(l => l.id === existing.id ? { ...l, taken: !newTaken } : l))
           toast.error('복약 상태 변경에 실패했습니다.')
         } else {
           toast.success(newTaken ? '복약 완료!' : '복약 취소')
         }
       } else {
-        // 신규 로그: 임시 ID로 즉시 추가 후 서버 응답으로 교체
         const tempId = `temp_${scheduleId}_${slot}`
         const optimisticLog: MedicationLog = {
           id: tempId,
@@ -90,11 +86,9 @@ export default function DashboardClient({ schedules, logs: initialLogs, userName
           .select('id,user_id,schedule_id,medication_id,log_date,time_slot,taken,taken_at')
           .single()
         if (error) {
-          // 실패 시 임시 항목 제거
           setLogs(prev => prev.filter(l => l.id !== tempId))
           toast.error('복약 기록에 실패했습니다.')
         } else if (data) {
-          // 임시 ID를 서버에서 발급된 실제 ID로 교체
           setLogs(prev => prev.map(l => l.id === tempId ? data : l))
           toast.success('복약 완료!')
         }
@@ -110,7 +104,6 @@ export default function DashboardClient({ schedules, logs: initialLogs, userName
 
   return (
     <div className="max-w-2xl mx-auto space-y-5">
-      {/* 헤더 */}
       <div>
         <p className="text-sm text-sage-500">{dateLabel}</p>
         <h1 className="text-2xl font-bold text-sage-900">
@@ -118,7 +111,6 @@ export default function DashboardClient({ schedules, logs: initialLogs, userName
         </h1>
       </div>
 
-      {/* 완료율 카드 */}
       <div className="card bg-gradient-to-r from-mint-500 to-mint-400 text-white border-0">
         <div className="flex items-center justify-between mb-3">
           <div>
@@ -142,7 +134,6 @@ export default function DashboardClient({ schedules, logs: initialLogs, userName
         )}
       </div>
 
-      {/* 시간대별 복약 목록 */}
       {schedules.length === 0 ? (
         <div className="card text-center py-12">
           <p className="text-4xl mb-3" role="img" aria-label="약">💊</p>

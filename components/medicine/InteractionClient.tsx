@@ -24,7 +24,6 @@ export default function InteractionClient({ medications, interactions }: {
         <p className="text-sm text-sage-500 mt-1">현재 복용 중인 약의 위험 조합을 확인합니다</p>
       </div>
 
-      {/* 현재 복용 약 목록 */}
       <div className="card">
         <h2 className="font-semibold text-sage-800 mb-3">복용 중인 약 ({medications.length}개)</h2>
         {medications.length === 0 ? (
@@ -40,7 +39,6 @@ export default function InteractionClient({ medications, interactions }: {
         )}
       </div>
 
-      {/* 분석 결과 */}
       {medications.length < 2 ? (
         <div className="card flex flex-col items-center py-10 text-center">
           <ShieldCheck className="w-12 h-12 text-sage-300 mb-3" />
