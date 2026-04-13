@@ -54,16 +54,23 @@ export default function MedicationCard({ medication: initialMed, showAddButton }
       <div className="flex items-start gap-3">
         <div className="w-14 h-14 rounded-xl bg-sage-100 flex items-center justify-center shrink-0 overflow-hidden">
           {medication.image_url ? (
-            <img src={medication.image_url} alt={medication.item_name} className="w-full h-full object-cover" />
-          ) : (
-            <span className="text-2xl">💊</span>
-          )}
+            <img
+              src={medication.image_url}
+              alt={medication.item_name}
+              className="w-full h-full object-cover"
+              onError={e => {
+                e.currentTarget.style.display = 'none'
+                e.currentTarget.nextElementSibling?.classList.remove('hidden')
+              }}
+            />
+          ) : null}
+          <span className={`text-2xl ${medication.image_url ? 'hidden' : ''}`}>💊</span>
         </div>
 
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
-            <div>
-              <h3 className="font-semibold text-sage-900 truncate">{medication.item_name}</h3>
+            <div className="min-w-0 flex-1">
+              <h3 className="font-semibold text-sage-900 break-keep leading-snug">{medication.item_name}</h3>
               {medication.entp_name && (
                 <p className="text-xs text-sage-500 mt-0.5">{medication.entp_name}</p>
               )}

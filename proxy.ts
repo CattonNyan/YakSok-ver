@@ -25,13 +25,18 @@ export async function proxy(request: NextRequest) {
     }
   )
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { user }, error } = await supabase.auth.getUser()
 
   const protectedPaths = ['/dashboard', '/search', '/schedule', '/calendar', '/interaction', '/chat', '/pharmacy-map', '/profile', '/medicine']
   const isProtected = protectedPaths.some(p => request.nextUrl.pathname.startsWith(p))
 
-  if (isProtected && !user) {
-    return NextResponse.redirect(new URL('/auth/login', request.url))
+  if (isProtected && (!user || error)) {
+    const response = NextResponse.redirect(new URL('/auth/login', request.url))
+    // Clear invalid auth cookies
+    request.cookies.getAll().forEach(({ name }) => {
+      if (name.startsWith('sb-')) response.cookies.delete(name)
+    })
+    return response
   }
 
   if (user && request.nextUrl.pathname.startsWith('/auth')) {
