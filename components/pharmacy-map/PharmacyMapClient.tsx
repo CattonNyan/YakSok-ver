@@ -48,6 +48,7 @@ export default function PharmacyMapClient() {
   const [searching, setSearching] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [geocodeError, setGeocodeError] = useState<string | null>(null)
+  const [pharmacyError, setPharmacyError] = useState<string | null>(null)
   const [mapMoved, setMapMoved] = useState(false)
 
   const clientId = process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID
@@ -124,6 +125,7 @@ export default function PharmacyMapClient() {
   const searchPharmacies = useCallback(async (lat: number, lng: number) => {
     setSearching(true)
     setMapMoved(false)
+    setPharmacyError(null)
     try {
       const delta = 0.014
       let bboxParam =
@@ -150,10 +152,14 @@ export default function PharmacyMapClient() {
 
       const res = await fetch(`/api/pharmacy/search?lat=${lat}&lng=${lng}${bboxParam}${userParam}`)
       const data = await res.json()
+      if (!res.ok || data.error) {
+        setPharmacyError(data.error ?? '약국 정보를 불러오지 못했습니다.')
+      }
       const items: Pharmacy[] = data.items ?? []
       setPharmacies(items)
       addPharmacyMarkers(items)
     } catch {
+      setPharmacyError('약국 정보를 불러오는 중 오류가 발생했습니다.')
       setPharmacies([])
     } finally {
       setSearching(false)
@@ -516,7 +522,7 @@ export default function PharmacyMapClient() {
                 <MapPin className="w-8 h-8 opacity-40" />
                 <p className="text-sm">약국 정보를 불러오지 못했습니다.</p>
                 <p className="text-xs text-center">
-                  API 키 설정 여부를 확인하거나
+                  {pharmacyError ?? 'API 키 설정 여부를 확인하거나'}
                   <br />새로고침 버튼을 눌러주세요.
                 </p>
               </div>
