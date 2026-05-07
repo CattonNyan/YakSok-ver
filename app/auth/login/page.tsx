@@ -29,7 +29,7 @@ export default function LoginPage() {
   }
 
   const handleSocialLogin = async (provider: 'google' | 'kakao') => {
-    const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || window.location.origin).replace(/\/$/, '')
+    const siteUrl = window.location.origin.replace(/\/$/, '')
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
