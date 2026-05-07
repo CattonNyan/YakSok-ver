@@ -33,7 +33,7 @@ export default function LoginPage() {
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
-      options: { redirectTo: `${siteUrl}/auth/callback?next=/dashboard` },
+      options: { redirectTo: `${siteUrl}/auth/callback` },
     })
     if (error) toast.error('소셜 로그인에 실패했습니다')
   }
