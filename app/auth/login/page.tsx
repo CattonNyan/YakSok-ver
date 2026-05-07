@@ -29,9 +29,11 @@ export default function LoginPage() {
   }
 
   const handleSocialLogin = async (provider: 'google' | 'kakao') => {
+    const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || window.location.origin).replace(/\/$/, '')
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: { redirectTo: `${siteUrl}/auth/callback?next=/dashboard` },
     })
     if (error) toast.error('소셜 로그인에 실패했습니다')
   }
