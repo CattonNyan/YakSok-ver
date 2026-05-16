@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-pretendard: 'Pretendard Variable', sans-serif;
+}
+
+@layer base {
+  * { box-sizing: border-box; }
+  html { font-family: 'Pretendard Variable', sans-serif; }
+  body { @apply bg-sage-50 text-sage-900; }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-mint-500 hover:bg-mint-600 text-white font-medium px-4 py-2.5 rounded-xl transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply bg-white hover:bg-sage-50 text-sage-700 font-medium px-4 py-2.5 rounded-xl border border-sage-200 transition-colors duration-200;
+  }
+  .card {
+    @apply bg-white rounded-2xl shadow-sm border border-sage-100 p-5;
+  }
+  .input-base {
+    @apply w-full px-4 py-3 rounded-xl border border-sage-200 bg-white text-sage-900 placeholder-sage-400 focus:outline-none focus:ring-2 focus:ring-mint-400 focus:border-transparent transition-all;
+  }
+  .badge-taken {
+    @apply inline-flex items-center gap-1 bg-mint-50 text-mint-700 text-xs font-medium px-2 py-0.5 rounded-full;
+  }
+  .badge-pending {
+    @apply inline-flex items-center gap-1 bg-sage-100 text-sage-500 text-xs font-medium px-2 py-0.5 rounded-full;
+  }
+}
+
+/* 스크롤 애니메이션 */
+.anim-fade-up {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.anim-fade-up.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 스크롤바 */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { @apply bg-sage-200 rounded-full; }
+
+/* 약물 상호작용 심각도 색상 */
+.severity-low { @apply text-mint-600 bg-mint-50; }
+.severity-medium { @apply text-amber-600 bg-amber-50; }
+.severity-high { @apply text-orange-600 bg-orange-50; }
+.severity-contraindicated { @apply text-red-600 bg-red-50; }
