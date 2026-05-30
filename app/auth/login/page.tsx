@@ -6,6 +6,24 @@ import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 
+function getAppOrigin() {
+  return (process.env.NEXT_PUBLIC_SITE_URL || window.location.origin).replace(/\/$/, '')
+}
+
+function getLoginErrorMessage(message: string) {
+  const normalized = message.toLowerCase()
+  if (normalized.includes('email not confirmed')) {
+    return '이메일 인증이 완료되지 않았습니다. 받은 인증 메일을 확인해 주세요.'
+  }
+  if (normalized.includes('invalid login credentials')) {
+    return '이메일 또는 비밀번호가 올바르지 않습니다.'
+  }
+  if (normalized.includes('too many requests')) {
+    return '요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.'
+  }
+  return '로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.'
+}
+
 export default function LoginPage() {
   const router = useRouter()
   const supabase = createClient()
@@ -17,9 +35,15 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const normalizedEmail = email.trim().toLowerCase()
+    const { error } = await supabase.auth.signInWithPassword({
+      email: normalizedEmail,
+      password,
+    })
     if (error) {
-      toast.error('이메일 또는 비밀번호가 올바르지 않습니다')
+      toast.error(getLoginErrorMessage(error.message))
+      setLoading(false)
+      return
     } else {
       toast.success('로그인 성공!')
       router.push('/dashboard')
@@ -31,7 +55,7 @@ export default function LoginPage() {
   const handleSocialLogin = async (provider: 'google' | 'kakao') => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: { redirectTo: `${getAppOrigin()}/auth/callback` },
     })
     if (error) toast.error('소셜 로그인에 실패했습니다')
   }

@@ -6,6 +6,10 @@ import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
 import { Loader2 } from 'lucide-react'
 
+function getAppOrigin() {
+  return (process.env.NEXT_PUBLIC_SITE_URL || window.location.origin).replace(/\/$/, '')
+}
+
 function getKoreanAuthError(message: string): string {
   const errorMap: Record<string, string> = {
     'User already registered': '이미 가입된 이메일 주소입니다. 로그인을 시도해 주세요.',
@@ -38,9 +42,15 @@ export default function SignupPage() {
       return
     }
     setLoading(true)
+    const normalizedEmail = email.trim().toLowerCase()
+    const normalizedName = name.trim()
     const { error } = await supabase.auth.signUp({
-      email, password,
-      options: { data: { full_name: name } },
+      email: normalizedEmail,
+      password,
+      options: {
+        data: { full_name: normalizedName },
+        emailRedirectTo: `${getAppOrigin()}/auth/callback`,
+      },
     })
     if (error) {
       toast.error(getKoreanAuthError(error.message))

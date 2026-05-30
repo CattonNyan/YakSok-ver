@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
+  const appOrigin = (process.env.NEXT_PUBLIC_SITE_URL || origin).replace(/\/$/, '')
   const code = searchParams.get('code')
   const nextParam = searchParams.get('next') ?? '/dashboard'
 
@@ -12,8 +13,8 @@ export async function GET(request: Request) {
   if (code) {
     const supabase = await createClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)
-    if (!error) return NextResponse.redirect(`${origin}${next}`)
+    if (!error) return NextResponse.redirect(`${appOrigin}${next}`)
   }
 
-  return NextResponse.redirect(`${origin}/auth/login?error=callback`)
+  return NextResponse.redirect(`${appOrigin}/auth/login?error=callback`)
 }
