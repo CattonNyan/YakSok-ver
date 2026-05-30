@@ -29,7 +29,6 @@ export async function proxy(request: NextRequest) {
 
   const protectedPaths = ['/dashboard', '/search', '/schedule', '/calendar', '/interaction', '/chat', '/pharmacy-map', '/profile', '/medicine']
   const isProtected = protectedPaths.some(p => request.nextUrl.pathname.startsWith(p))
-  const isAuthCallback = request.nextUrl.pathname.startsWith('/auth/callback')
 
   if (isProtected && (!user || error)) {
     const response = NextResponse.redirect(new URL('/auth/login', request.url))
@@ -40,7 +39,7 @@ export async function proxy(request: NextRequest) {
     return response
   }
 
-  if (user && request.nextUrl.pathname.startsWith('/auth') && !isAuthCallback) {
+  if (user && request.nextUrl.pathname.startsWith('/auth')) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
