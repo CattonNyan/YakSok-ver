@@ -5,7 +5,12 @@ frontend:
       commands:
         - printf "NEXT_PUBLIC_SUPABASE_URL=%s\n" "$NEXT_PUBLIC_SUPABASE_URL" >> .env.production
         - printf "NEXT_PUBLIC_SUPABASE_ANON_KEY=%s\n" "$NEXT_PUBLIC_SUPABASE_ANON_KEY" >> .env.production
+        - printf "SUPABASE_SERVICE_ROLE_KEY=%s\n" "$SUPABASE_SERVICE_ROLE_KEY" >> .env.production
         - printf "NEXT_PUBLIC_SITE_URL=%s\n" "$NEXT_PUBLIC_SITE_URL" >> .env.production
+        - printf "NEXT_PUBLIC_PORTONE_STORE_ID=%s\n" "$NEXT_PUBLIC_PORTONE_STORE_ID" >> .env.production
+        - printf "NEXT_PUBLIC_PORTONE_CHANNEL_KEY=%s\n" "$NEXT_PUBLIC_PORTONE_CHANNEL_KEY" >> .env.production
+        - printf "PORTONE_API_SECRET=%s\n" "$PORTONE_API_SECRET" >> .env.production
+        - printf "IDENTITY_HASH_SECRET=%s\n" "$IDENTITY_HASH_SECRET" >> .env.production
         - printf "GROQ_API_KEY=%s\n" "$GROQ_API_KEY" >> .env.production
         - printf "NEXT_PUBLIC_NAVER_MAP_CLIENT_ID=%s\n" "$NEXT_PUBLIC_NAVER_MAP_CLIENT_ID" >> .env.production
         - printf "NAVER_CLIENT_ID=%s\n" "$NAVER_CLIENT_ID" >> .env.production

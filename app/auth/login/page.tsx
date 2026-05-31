@@ -1,8 +1,10 @@
 'use client'
+
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { usernameToAuthEmail } from '@/lib/account'
 import toast from 'react-hot-toast'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 
@@ -16,7 +18,7 @@ function getLoginErrorMessage(message: string) {
     return '이메일 인증이 완료되지 않았습니다. 받은 인증 메일을 확인해 주세요.'
   }
   if (normalized.includes('invalid login credentials')) {
-    return '이메일 또는 비밀번호가 올바르지 않습니다.'
+    return '아이디 또는 비밀번호가 올바르지 않습니다.'
   }
   if (normalized.includes('too many requests')) {
     return '요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.'
@@ -27,7 +29,7 @@ function getLoginErrorMessage(message: string) {
 export default function LoginPage() {
   const router = useRouter()
   const supabase = createClient()
-  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [showPw, setShowPw] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -35,20 +37,19 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    const normalizedEmail = email.trim().toLowerCase()
     const { error } = await supabase.auth.signInWithPassword({
-      email: normalizedEmail,
+      email: usernameToAuthEmail(username),
       password,
     })
     if (error) {
       toast.error(getLoginErrorMessage(error.message))
       setLoading(false)
       return
-    } else {
-      toast.success('로그인 성공!')
-      router.push('/dashboard')
-      router.refresh()
     }
+
+    toast.success('로그인 성공!')
+    router.push('/dashboard')
+    router.refresh()
     setLoading(false)
   }
 
@@ -65,7 +66,6 @@ export default function LoginPage() {
       <h1 className="text-2xl font-bold text-sage-900 mb-1">로그인</h1>
       <p className="text-sm text-sage-500 mb-6">복약 관리를 계속하세요</p>
 
-      {/* 소셜 로그인 */}
       <div className="space-y-2 mb-6">
         <button onClick={() => handleSocialLogin('google')}
           className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl border border-sage-200 bg-white hover:bg-sage-50 transition-colors text-sm font-medium text-sage-700">
@@ -91,22 +91,33 @@ export default function LoginPage() {
           <div className="w-full border-t border-sage-200" />
         </div>
         <div className="relative flex justify-center text-xs">
-          <span className="bg-white px-3 text-sage-400">또는 이메일로</span>
+          <span className="bg-white px-3 text-sage-400">또는 아이디로</span>
         </div>
       </div>
 
       <form onSubmit={handleLogin} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-sage-700 mb-1.5">이메일</label>
-          <input type="email" value={email} onChange={e => setEmail(e.target.value)}
-            placeholder="example@email.com" required className="input-base" />
+          <label className="block text-sm font-medium text-sage-700 mb-1.5">아이디</label>
+          <input
+            type="text"
+            value={username}
+            onChange={e => setUsername(e.target.value)}
+            placeholder="yaksok_user"
+            required
+            className="input-base"
+          />
         </div>
         <div>
           <label className="block text-sm font-medium text-sage-700 mb-1.5">비밀번호</label>
           <div className="relative">
-            <input type={showPw ? 'text' : 'password'} value={password}
+            <input
+              type={showPw ? 'text' : 'password'}
+              value={password}
               onChange={e => setPassword(e.target.value)}
-              placeholder="비밀번호 입력" required className="input-base pr-11" />
+              placeholder="비밀번호 입력"
+              required
+              className="input-base pr-11"
+            />
             <button
               type="button"
               onClick={() => setShowPw(!showPw)}

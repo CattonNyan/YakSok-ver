@@ -172,6 +172,56 @@ create index if not exists idx_medication_logs_user_date
 -- =============================================
 -- 자동 프로필 생성 트리거
 -- =============================================
+-- =============================================
+-- PASS / PortOne identity verification
+-- =============================================
+
+alter table public.profiles
+  add column if not exists username text,
+  add column if not exists identity_verified boolean default false,
+  add column if not exists identity_verified_at timestamptz,
+  add column if not exists verified_name text,
+  add column if not exists verified_phone_last4 text,
+  add column if not exists ci_hash text,
+  add column if not exists di_hash text,
+  add column if not exists identity_provider text;
+
+create unique index if not exists idx_profiles_ci_hash_unique
+  on public.profiles(ci_hash)
+  where ci_hash is not null;
+
+create unique index if not exists idx_profiles_username_unique
+  on public.profiles(username)
+  where username is not null;
+
+create unique index if not exists idx_profiles_di_hash_unique
+  on public.profiles(di_hash)
+  where di_hash is not null;
+
+create table if not exists public.identity_verifications (
+  id uuid default gen_random_uuid() primary key,
+  verification_token_hash text unique not null,
+  portone_identity_verification_id text unique not null,
+  ci_hash text,
+  di_hash text,
+  verified_name text not null,
+  phone_last4 text,
+  birth_date date,
+  gender text,
+  status text default 'verified' check (status in ('verified', 'failed')),
+  expires_at timestamptz not null,
+  used_at timestamptz,
+  created_at timestamptz default now()
+);
+
+alter table public.identity_verifications enable row level security;
+
+create index if not exists idx_identity_verifications_token
+  on public.identity_verifications(verification_token_hash);
+
+create index if not exists idx_identity_verifications_expires_at
+  on public.identity_verifications(expires_at);
+
 create or replace function public.handle_new_user()
 returns trigger
 language plpgsql
