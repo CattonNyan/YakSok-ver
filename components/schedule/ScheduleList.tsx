@@ -8,11 +8,11 @@ import type { Schedule, TimeSlot, Medication } from '@/types'
 import clsx from 'clsx'
 import Link from 'next/link'
 
-const SLOT_LABELS: Record<TimeSlot, { label: string; icon: React.ElementType; color: string; bg: string }> = {
-  morning: { label: '아침',    icon: Sun,    color: 'text-amber-500',  bg: 'bg-amber-50' },
-  lunch:   { label: '점심',    icon: Coffee, color: 'text-orange-500', bg: 'bg-orange-50' },
-  dinner:  { label: '저녁',    icon: Sunset, color: 'text-purple-500', bg: 'bg-purple-50' },
-  bedtime: { label: '취침 전', icon: Moon,   color: 'text-blue-500',   bg: 'bg-blue-50' },
+const SLOT_LABELS: Record<TimeSlot, { label: string; icon: React.ElementType; color: string; bg: string; darkBg: string }> = {
+  morning: { label: '아침',    icon: Sun,    color: 'text-amber-500',  bg: 'bg-amber-50',  darkBg: 'dark:bg-amber-900/20' },
+  lunch:   { label: '점심',    icon: Coffee, color: 'text-orange-500', bg: 'bg-orange-50', darkBg: 'dark:bg-orange-900/20' },
+  dinner:  { label: '저녁',    icon: Sunset, color: 'text-purple-500', bg: 'bg-purple-50', darkBg: 'dark:bg-purple-900/20' },
+  bedtime: { label: '취침 전', icon: Moon,   color: 'text-blue-500',   bg: 'bg-blue-50',   darkBg: 'dark:bg-blue-900/20' },
 }
 
 type ScheduleWithMed = Schedule & { medication: Pick<Medication, 'item_name' | 'entp_name' | 'image_url'> | null }
@@ -45,11 +45,11 @@ export default function ScheduleList({ schedules: initial }: { schedules: Schedu
 
   if (schedules.length === 0) {
     return (
-      <div className="bg-white rounded-3xl border border-sage-100 shadow-sm p-12 text-center">
-        <div className="w-16 h-16 bg-mint-50 rounded-3xl flex items-center justify-center mx-auto mb-4">
+      <div className="bg-white dark:bg-sage-800 rounded-3xl border border-sage-100 dark:border-sage-700 shadow-sm p-12 text-center">
+        <div className="w-16 h-16 bg-mint-50 dark:bg-mint-900/20 rounded-3xl flex items-center justify-center mx-auto mb-4">
           <span className="text-3xl" role="img" aria-label="약">💊</span>
         </div>
-        <p className="font-semibold text-sage-700 mb-1">등록된 복약 일정이 없습니다</p>
+        <p className="font-semibold text-sage-700 dark:text-sage-200 mb-1">등록된 복약 일정이 없습니다</p>
         <p className="text-sm text-sage-400 mb-6">약 추가 버튼을 눌러 시작하세요</p>
         <Link
           href="/schedule/new"
@@ -68,15 +68,15 @@ export default function ScheduleList({ schedules: initial }: { schedules: Schedu
     <div
       key={s.id}
       className={clsx(
-        'bg-white rounded-3xl border shadow-sm p-5 transition-all duration-200',
-        s.is_active ? 'border-sage-100' : 'border-sage-100 opacity-55'
+        'bg-white dark:bg-sage-800 rounded-3xl border shadow-sm p-5 transition-all duration-200',
+        s.is_active ? 'border-sage-100 dark:border-sage-700' : 'border-sage-100 dark:border-sage-700 opacity-55'
       )}
     >
       <div className="flex items-start gap-4">
         {/* 약 아이콘 */}
         <div className={clsx(
           'w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 overflow-hidden',
-          s.is_active ? 'bg-mint-50' : 'bg-sage-100'
+          s.is_active ? 'bg-mint-50 dark:bg-mint-900/20' : 'bg-sage-100 dark:bg-sage-700'
         )}>
           {s.medication?.image_url
             ? <img src={s.medication.image_url} alt={s.medication.item_name ?? ''} className="w-full h-full object-cover" />
@@ -88,7 +88,7 @@ export default function ScheduleList({ schedules: initial }: { schedules: Schedu
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
-              <p className="font-bold text-sage-900 truncate">{s.medication?.item_name ?? '알 수 없는 약'}</p>
+              <p className="font-bold text-sage-900 dark:text-sage-50 truncate">{s.medication?.item_name ?? '알 수 없는 약'}</p>
               {s.medication?.entp_name && (
                 <p className="text-xs text-sage-400 mt-0.5">{s.medication.entp_name}</p>
               )}
@@ -102,16 +102,16 @@ export default function ScheduleList({ schedules: initial }: { schedules: Schedu
                 className={clsx(
                   'p-2 rounded-xl transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center',
                   s.is_active
-                    ? 'text-mint-500 hover:bg-mint-50'
-                    : 'text-sage-400 hover:bg-sage-50'
+                    ? 'text-mint-500 hover:bg-mint-50 dark:hover:bg-mint-900/20'
+                    : 'text-sage-400 hover:bg-sage-50 dark:hover:bg-sage-700'
                 )}
               >
                 <Power className="w-4 h-4" aria-hidden />
               </button>
 
               {pendingDeleteId === s.id ? (
-                <div className="flex items-center gap-1 bg-red-50 border border-red-100 rounded-xl px-2 py-1">
-                  <span className="text-xs text-red-600 font-medium whitespace-nowrap">삭제할까요?</span>
+                <div className="flex items-center gap-1 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 rounded-xl px-2 py-1">
+                  <span className="text-xs text-red-600 dark:text-red-400 font-medium whitespace-nowrap">삭제할까요?</span>
                   <button
                     onClick={() => confirmDelete(s.id)}
                     className="p-1 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors"
@@ -120,7 +120,7 @@ export default function ScheduleList({ schedules: initial }: { schedules: Schedu
                   </button>
                   <button
                     onClick={() => setPendingDeleteId(null)}
-                    className="p-1 rounded-lg text-sage-400 hover:bg-sage-100 transition-colors"
+                    className="p-1 rounded-lg text-sage-400 hover:bg-sage-100 dark:hover:bg-sage-700 transition-colors"
                   >
                     <X className="w-3.5 h-3.5" aria-hidden />
                   </button>
@@ -129,7 +129,7 @@ export default function ScheduleList({ schedules: initial }: { schedules: Schedu
                 <button
                   onClick={() => setPendingDeleteId(s.id)}
                   aria-label="삭제"
-                  className="p-2 rounded-xl hover:bg-red-50 text-sage-300 hover:text-red-400 transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center"
+                  className="p-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 text-sage-300 hover:text-red-400 transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center"
                 >
                   <Trash2 className="w-4 h-4" aria-hidden />
                 </button>
@@ -140,9 +140,9 @@ export default function ScheduleList({ schedules: initial }: { schedules: Schedu
           {/* 시간대 배지 */}
           <div className="flex flex-wrap gap-1.5 mt-3">
             {s.time_slots.map((slot: TimeSlot) => {
-              const { label, icon: Icon, color, bg } = SLOT_LABELS[slot]
+              const { label, icon: Icon, color, bg, darkBg } = SLOT_LABELS[slot]
               return (
-                <span key={slot} className={clsx('inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full', bg, color)}>
+                <span key={slot} className={clsx('inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full', bg, darkBg, color)}>
                   <Icon className="w-3 h-3" aria-hidden /> {label}
                 </span>
               )
@@ -152,7 +152,7 @@ export default function ScheduleList({ schedules: initial }: { schedules: Schedu
           {/* 기간 + 용량 */}
           <p className="text-xs text-sage-400 mt-2">
             {s.start_date} {s.end_date ? `~ ${s.end_date}` : '~ 계속'}
-            {s.dosage && <span className="ml-2 text-sage-500 font-medium">{s.dosage}</span>}
+            {s.dosage && <span className="ml-2 text-sage-500 dark:text-sage-400 font-medium">{s.dosage}</span>}
           </p>
         </div>
       </div>

@@ -6,10 +6,11 @@ import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
 import {
   LayoutDashboard, Search, CalendarDays, Pill,
-  ShieldAlert, Bot, LogOut, Menu, Loader2, UserCircle, MapPin, X
+  ShieldAlert, Bot, LogOut, Menu, Loader2, UserCircle, MapPin, X, Sun, Moon
 } from 'lucide-react'
 import { useState } from 'react'
 import clsx from 'clsx'
+import { useTheme } from '@/components/ThemeProvider'
 
 const NAV_MAIN = [
   { href: '/dashboard',    label: '오늘의 복약',   icon: LayoutDashboard },
@@ -52,6 +53,22 @@ function NavLink({ href, label, Icon, onClick }: {
   )
 }
 
+function ThemeToggleButton() {
+  const { theme, toggle } = useTheme()
+  return (
+    <button
+      onClick={toggle}
+      aria-label={theme === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환'}
+      className="flex items-center gap-3 px-3 py-2.5 w-full rounded-xl text-sm font-medium transition-all duration-150 text-sage-400 hover:bg-white/6 hover:text-sage-200"
+    >
+      {theme === 'dark'
+        ? <Sun className="w-4.5 h-4.5 shrink-0" aria-hidden />
+        : <Moon className="w-4.5 h-4.5 shrink-0" aria-hidden />}
+      {theme === 'dark' ? '라이트 모드' : '다크 모드'}
+    </button>
+  )
+}
+
 function Sidebar({ onClose, isLoggingOut, onLogout }: {
   onClose: () => void
   isLoggingOut: boolean
@@ -81,6 +98,7 @@ function Sidebar({ onClose, isLoggingOut, onLogout }: {
         {NAV_BOTTOM.map(({ href, label, icon: Icon }) => (
           <NavLink key={href} href={href} label={label} Icon={Icon} onClick={onClose} />
         ))}
+        <ThemeToggleButton />
         <button
           onClick={onLogout}
           disabled={isLoggingOut}
@@ -122,7 +140,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex h-screen bg-[#f7fdf9] overflow-hidden">
+    <div className="flex h-screen bg-[#f7fdf9] dark:bg-sage-950 overflow-hidden">
       {/* 데스크탑 사이드바 */}
       <div className="hidden md:flex md:shrink-0">
         <Sidebar onClose={() => {}} isLoggingOut={isLoggingOut} onLogout={handleLogout} />

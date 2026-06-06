@@ -13,7 +13,7 @@ interface Props {
 function Badge({ label, value }: { label: string; value?: string }) {
   if (!value) return null
   return (
-    <span className="inline-flex items-center gap-1 text-xs bg-sage-50 text-sage-500 px-2.5 py-0.5 rounded-full border border-sage-100">
+    <span className="inline-flex items-center gap-1 text-xs bg-sage-50 dark:bg-sage-700 text-sage-500 dark:text-sage-400 px-2.5 py-0.5 rounded-full border border-sage-100 dark:border-sage-600">
       <span className="text-sage-400 font-medium">{label}</span> {value}
     </span>
   )
@@ -49,11 +49,11 @@ export default function MedicationCard({ medication: initialMed, showAddButton }
   const colorText = [medication.color_class1, medication.color_class2].filter(Boolean).join(' + ')
 
   return (
-    <div className="bg-white rounded-3xl border border-sage-100 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
+    <div className="bg-white dark:bg-sage-800 rounded-3xl border border-sage-100 dark:border-sage-700 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
       <div className="p-5">
         <div className="flex items-start gap-4">
           {/* 약 이미지 */}
-          <div className="w-16 h-16 rounded-2xl bg-sage-50 border border-sage-100 flex items-center justify-center shrink-0 overflow-hidden">
+          <div className="w-16 h-16 rounded-2xl bg-sage-50 dark:bg-sage-700 border border-sage-100 dark:border-sage-600 flex items-center justify-center shrink-0 overflow-hidden">
             {medication.image_url ? (
               <img
                 src={medication.image_url}
@@ -71,12 +71,12 @@ export default function MedicationCard({ medication: initialMed, showAddButton }
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0 flex-1">
-                <h3 className="font-bold text-sage-900 break-keep leading-snug">{medication.item_name}</h3>
+                <h3 className="font-bold text-sage-900 dark:text-sage-50 break-keep leading-snug">{medication.item_name}</h3>
                 {medication.entp_name && (
                   <p className="text-xs text-sage-400 mt-0.5">{medication.entp_name}</p>
                 )}
                 {medication.class_name && (
-                  <span className="inline-block mt-1.5 text-xs bg-mint-50 text-mint-700 border border-mint-100 px-2.5 py-0.5 rounded-full font-medium">
+                  <span className="inline-block mt-1.5 text-xs bg-mint-50 dark:bg-mint-900/20 text-mint-700 dark:text-mint-400 border border-mint-100 dark:border-mint-800 px-2.5 py-0.5 rounded-full font-medium">
                     {medication.class_name}
                   </span>
                 )}
@@ -86,7 +86,7 @@ export default function MedicationCard({ medication: initialMed, showAddButton }
                 {showAddButton && (
                   <Link
                     href={`/schedule/new?med=${medication.id}`}
-                    className="flex items-center gap-1.5 text-xs font-semibold text-mint-600 bg-mint-50 hover:bg-mint-100 border border-mint-100 px-3 py-1.5 rounded-xl transition-colors"
+                    className="flex items-center gap-1.5 text-xs font-semibold text-mint-600 dark:text-mint-400 bg-mint-50 dark:bg-mint-900/20 hover:bg-mint-100 dark:hover:bg-mint-900/30 border border-mint-100 dark:border-mint-800 px-3 py-1.5 rounded-xl transition-colors"
                   >
                     <Plus className="w-3.5 h-3.5" /> 추가
                   </Link>
@@ -94,7 +94,7 @@ export default function MedicationCard({ medication: initialMed, showAddButton }
                 <button
                   onClick={handleExpand}
                   aria-label={expanded ? '접기' : '상세 보기'}
-                  className="w-8 h-8 text-sage-400 hover:text-sage-600 rounded-xl hover:bg-sage-50 flex items-center justify-center transition-colors"
+                  className="w-8 h-8 text-sage-400 hover:text-sage-600 dark:hover:text-sage-200 rounded-xl hover:bg-sage-50 dark:hover:bg-sage-700 flex items-center justify-center transition-colors"
                 >
                   {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                 </button>
@@ -111,7 +111,7 @@ export default function MedicationCard({ medication: initialMed, showAddButton }
             )}
 
             {!expanded && medication.efficacy && (
-              <p className="text-xs text-sage-500 mt-2.5 line-clamp-2 leading-relaxed">
+              <p className="text-xs text-sage-500 dark:text-sage-400 mt-2.5 line-clamp-2 leading-relaxed">
                 {medication.efficacy}
               </p>
             )}
@@ -121,7 +121,7 @@ export default function MedicationCard({ medication: initialMed, showAddButton }
 
       {/* 상세 정보 */}
       {expanded && (
-        <div className="border-t border-sage-50 bg-sage-50/50 px-5 py-4 space-y-4">
+        <div className="border-t border-sage-50 dark:border-sage-700 bg-sage-50/50 dark:bg-sage-900/40 px-5 py-4 space-y-4">
           {detailState === 'loading' && (
             <div className="flex items-center gap-2 py-2 text-sage-400">
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -140,19 +140,19 @@ export default function MedicationCard({ medication: initialMed, showAddButton }
             { label: '상호작용',   content: medication.interaction_info },
           ].filter(i => i.content).map(({ label, content }) => (
             <div key={label}>
-              <p className="text-xs font-bold text-sage-500 uppercase tracking-wide mb-1.5">{label}</p>
-              <p className="text-xs text-sage-700 leading-relaxed whitespace-pre-line">{content}</p>
+              <p className="text-xs font-bold text-sage-500 dark:text-sage-400 uppercase tracking-wide mb-1.5">{label}</p>
+              <p className="text-xs text-sage-700 dark:text-sage-300 leading-relaxed whitespace-pre-line">{content}</p>
             </div>
           ))}
 
           {medication.chart && (
             <div>
-              <p className="text-xs font-bold text-sage-500 uppercase tracking-wide mb-1.5">성상</p>
-              <p className="text-xs text-sage-700 leading-relaxed">{medication.chart}</p>
+              <p className="text-xs font-bold text-sage-500 dark:text-sage-400 uppercase tracking-wide mb-1.5">성상</p>
+              <p className="text-xs text-sage-700 dark:text-sage-300 leading-relaxed">{medication.chart}</p>
             </div>
           )}
 
-          <div className="flex items-center justify-between pt-1 border-t border-sage-100">
+          <div className="flex items-center justify-between pt-1 border-t border-sage-100 dark:border-sage-700">
             <p className="text-xs text-sage-400">⚠️ 참고용 정보이며 의료 진단을 대체하지 않습니다</p>
             {showAddButton && (
               <Link

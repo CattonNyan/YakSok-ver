@@ -39,12 +39,12 @@ function ColorPicker({ selected, onChange }: { selected: string; onChange: (v: s
           className={clsx(
             'flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs border-2 transition-all font-medium',
             selected === value
-              ? 'border-mint-300 bg-mint-50 text-mint-700'
-              : 'border-sage-100 text-sage-500 hover:border-sage-200 bg-white'
+              ? 'border-mint-300 bg-mint-50 dark:bg-mint-900/20 text-mint-700 dark:text-mint-400'
+              : 'border-sage-100 dark:border-sage-600 text-sage-500 dark:text-sage-400 hover:border-sage-200 dark:hover:border-sage-500 bg-white dark:bg-sage-800'
           )}
         >
           <span
-            className="w-3.5 h-3.5 rounded-full border border-sage-200 shrink-0"
+            className="w-3.5 h-3.5 rounded-full border border-sage-200 dark:border-sage-600 shrink-0"
             style={{ background: hex === 'transparent' ? 'linear-gradient(135deg, #fff 45%, #e2e8f0 45%)' : hex }}
           />
           {label}
@@ -165,12 +165,12 @@ export default function SearchPage() {
       {/* 헤더 */}
       <div>
         <p className="text-xs font-bold text-mint-600 tracking-widest uppercase mb-1">Medication Search</p>
-        <h1 className="text-3xl font-bold text-sage-900 tracking-tight">약 검색</h1>
+        <h1 className="text-3xl font-bold text-sage-900 dark:text-sage-50 tracking-tight">약 검색</h1>
         <p className="text-sage-400 mt-1">약품명 또는 사진으로 의약품 정보를 확인하세요</p>
       </div>
 
       {/* 모드 탭 */}
-      <div className="flex gap-1 p-1 bg-white border border-sage-100 rounded-2xl shadow-sm w-fit">
+      <div className="flex gap-1 p-1 bg-white dark:bg-sage-800 border border-sage-100 dark:border-sage-700 rounded-2xl shadow-sm w-fit">
         {MODES.map(({ key, label, icon: Icon }) => (
           <button
             key={key}
@@ -179,7 +179,7 @@ export default function SearchPage() {
               'flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150',
               mode === key
                 ? 'bg-mint-500 text-white shadow-md shadow-mint-500/20'
-                : 'text-sage-500 hover:text-sage-700 hover:bg-sage-50'
+                : 'text-sage-500 dark:text-sage-400 hover:text-sage-700 dark:hover:text-sage-200 hover:bg-sage-50 dark:hover:bg-sage-700'
             )}
           >
             <Icon className="w-4 h-4" /> {label}
@@ -209,7 +209,7 @@ export default function SearchPage() {
 
       {/* ── 모양 검색 ── */}
       {mode === 'shape' && (
-        <div className="bg-white rounded-3xl border border-sage-100 shadow-sm p-6 space-y-6">
+        <div className="bg-white dark:bg-sage-800 rounded-3xl border border-sage-100 dark:border-sage-700 shadow-sm p-6 space-y-6">
           <div>
             <p className="text-xs font-bold text-sage-400 tracking-widest uppercase mb-3">알약 모양</p>
             <div className="flex flex-wrap gap-2">
@@ -221,8 +221,8 @@ export default function SearchPage() {
                   className={clsx(
                     'px-3 py-1.5 rounded-2xl text-sm border-2 font-medium transition-all',
                     selectedShape === shape
-                      ? 'border-mint-300 bg-mint-50 text-mint-700'
-                      : 'border-sage-100 text-sage-500 hover:border-sage-200 bg-white'
+                      ? 'border-mint-300 bg-mint-50 dark:bg-mint-900/20 text-mint-700 dark:text-mint-400'
+                      : 'border-sage-100 dark:border-sage-600 text-sage-500 dark:text-sage-400 hover:border-sage-200 dark:hover:border-sage-500 bg-white dark:bg-sage-800'
                   )}
                 >
                   {shape}
@@ -254,8 +254,8 @@ export default function SearchPage() {
                   className={clsx(
                     'px-3 py-1.5 rounded-2xl text-sm border-2 font-medium transition-all',
                     selectedForm === form
-                      ? 'border-mint-300 bg-mint-50 text-mint-700'
-                      : 'border-sage-100 text-sage-500 hover:border-sage-200 bg-white'
+                      ? 'border-mint-300 bg-mint-50 dark:bg-mint-900/20 text-mint-700 dark:text-mint-400'
+                      : 'border-sage-100 dark:border-sage-600 text-sage-500 dark:text-sage-400 hover:border-sage-200 dark:hover:border-sage-500 bg-white dark:bg-sage-800'
                   )}
                 >
                   {form}
@@ -272,7 +272,7 @@ export default function SearchPage() {
           </div>
 
           {hasShapeFilter && (
-            <button type="button" onClick={resetShape} className="text-xs text-sage-400 hover:text-sage-600 flex items-center gap-1">
+            <button type="button" onClick={resetShape} className="text-xs text-sage-400 hover:text-sage-600 dark:hover:text-sage-300 flex items-center gap-1">
               <X className="w-3 h-3" /> 선택 초기화
             </button>
           )}
@@ -291,9 +291,9 @@ export default function SearchPage() {
       {/* ── 사진 검색 ── */}
       {mode === 'image' && (
         <div className="space-y-3">
-          <div className="bg-white rounded-3xl border border-sage-100 shadow-sm p-5 space-y-4">
+          <div className="bg-white dark:bg-sage-800 rounded-3xl border border-sage-100 dark:border-sage-700 shadow-sm p-5 space-y-4">
             {/* 서브탭 */}
-            <div className="flex gap-1 p-1 bg-sage-50 rounded-2xl">
+            <div className="flex gap-1 p-1 bg-sage-50 dark:bg-sage-700 rounded-2xl">
               {([
                 { key: 'upload' as const, label: '파일 업로드', icon: Upload },
                 { key: 'camera' as const, label: '직접 촬영',   icon: Camera },
@@ -307,7 +307,9 @@ export default function SearchPage() {
                   }}
                   className={clsx(
                     'flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-semibold transition-colors',
-                    imageTab === key ? 'bg-white text-sage-900 shadow-sm' : 'text-sage-500 hover:text-sage-700'
+                    imageTab === key
+                      ? 'bg-white dark:bg-sage-800 text-sage-900 dark:text-sage-50 shadow-sm'
+                      : 'text-sage-500 dark:text-sage-400 hover:text-sage-700 dark:hover:text-sage-200'
                   )}
                 >
                   <Icon className="w-4 h-4" /> {label}
@@ -320,7 +322,7 @@ export default function SearchPage() {
               <>
                 <div
                   onClick={() => fileRef.current?.click()}
-                  className="relative border-2 border-dashed border-sage-200 rounded-2xl cursor-pointer hover:border-mint-300 hover:bg-mint-50/40 transition-all overflow-hidden"
+                  className="relative border-2 border-dashed border-sage-200 dark:border-sage-600 rounded-2xl cursor-pointer hover:border-mint-300 hover:bg-mint-50/40 dark:hover:bg-mint-900/10 transition-all overflow-hidden"
                   style={{ aspectRatio: '4/3' }}
                 >
                   {imagePreview ? (
@@ -328,21 +330,21 @@ export default function SearchPage() {
                       <img src={imagePreview} alt="미리보기" className="w-full h-full object-contain" />
                       <button
                         onClick={e => { e.stopPropagation(); setImagePreview(null) }}
-                        className="absolute top-2 right-2 bg-white/90 text-sage-600 rounded-full p-1.5 shadow"
+                        className="absolute top-2 right-2 bg-white/90 dark:bg-sage-800/90 text-sage-600 dark:text-sage-300 rounded-full p-1.5 shadow"
                       >
                         <X className="w-3.5 h-3.5" />
                       </button>
                     </>
                   ) : (
                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-center p-6">
-                      <div className="w-14 h-14 rounded-2xl bg-sage-100 flex items-center justify-center">
+                      <div className="w-14 h-14 rounded-2xl bg-sage-100 dark:bg-sage-700 flex items-center justify-center">
                         <Upload className="w-6 h-6 text-sage-400" />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-sage-600">사진을 업로드하세요</p>
+                        <p className="text-sm font-semibold text-sage-600 dark:text-sage-300">사진을 업로드하세요</p>
                         <p className="text-xs text-sage-400 mt-0.5">JPG, PNG · 최대 5MB</p>
                       </div>
-                      <span className="text-xs text-mint-600 font-semibold border border-mint-200 bg-mint-50 px-3 py-1 rounded-full">
+                      <span className="text-xs text-mint-600 dark:text-mint-400 font-semibold border border-mint-200 dark:border-mint-700 bg-mint-50 dark:bg-mint-900/20 px-3 py-1 rounded-full">
                         클릭하여 선택
                       </span>
                     </div>
@@ -373,13 +375,13 @@ export default function SearchPage() {
             {imageTab === 'camera' && (
               <>
                 {!cameraActive && !capturedImage && (
-                  <div className="relative rounded-2xl overflow-hidden border border-sage-100 bg-sage-50" style={{ aspectRatio: '4/3' }}>
+                  <div className="relative rounded-2xl overflow-hidden border border-sage-100 dark:border-sage-700 bg-sage-50 dark:bg-sage-700" style={{ aspectRatio: '4/3' }}>
                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-6 text-center">
-                      <div className="w-16 h-16 rounded-2xl bg-white border border-sage-100 shadow-sm flex items-center justify-center">
+                      <div className="w-16 h-16 rounded-2xl bg-white dark:bg-sage-800 border border-sage-100 dark:border-sage-600 shadow-sm flex items-center justify-center">
                         <Camera className="w-7 h-7 text-mint-400" />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-sage-700">알약을 직접 촬영하세요</p>
+                        <p className="text-sm font-semibold text-sage-700 dark:text-sage-200">알약을 직접 촬영하세요</p>
                         <p className="text-xs text-sage-400 mt-1 leading-relaxed">카메라로 알약을 박스 안에 맞춰 찍으면<br />AI가 약을 찾아드립니다</p>
                       </div>
                       <button
@@ -419,7 +421,7 @@ export default function SearchPage() {
                     <img src={capturedImage} alt="촬영된 약" className="w-full h-full object-cover" />
                     <button
                       onClick={() => { setCapturedImage(null); startCamera() }}
-                      className="absolute top-2 right-2 bg-white/90 text-sage-600 rounded-full p-1.5 shadow"
+                      className="absolute top-2 right-2 bg-white/90 dark:bg-sage-800/90 text-sage-600 dark:text-sage-300 rounded-full p-1.5 shadow"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -430,7 +432,7 @@ export default function SearchPage() {
                 )}
 
                 {cameraActive && (
-                  <button onClick={stopCamera} className="w-full py-2 text-sm text-sage-400 hover:text-sage-600 transition-colors">
+                  <button onClick={stopCamera} className="w-full py-2 text-sm text-sage-400 hover:text-sage-600 dark:hover:text-sage-300 transition-colors">
                     취소
                   </button>
                 )}
@@ -449,9 +451,9 @@ export default function SearchPage() {
             <canvas ref={canvasRef} className="hidden" />
           </div>
 
-          <div className="flex items-start gap-2.5 p-4 bg-amber-50 border border-amber-100 rounded-2xl">
+          <div className="flex items-start gap-2.5 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800 rounded-2xl">
             <AlertCircle className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
-            <p className="text-xs text-amber-700 leading-relaxed">AI가 후보 약품을 제안하며 정확도는 100%가 아닐 수 있습니다. 반드시 직접 확인하세요.</p>
+            <p className="text-xs text-amber-700 dark:text-amber-300 leading-relaxed">AI가 후보 약품을 제안하며 정확도는 100%가 아닐 수 있습니다. 반드시 직접 확인하세요.</p>
           </div>
         </div>
       )}
@@ -459,10 +461,10 @@ export default function SearchPage() {
       {/* 로딩 */}
       {loading && (
         <div className="flex flex-col items-center py-14 gap-3">
-          <div className="w-14 h-14 bg-mint-50 rounded-3xl flex items-center justify-center">
+          <div className="w-14 h-14 bg-mint-50 dark:bg-mint-900/20 rounded-3xl flex items-center justify-center">
             <Loader2 className="w-7 h-7 text-mint-500 animate-spin" />
           </div>
-          <p className="text-sage-500 text-sm font-medium">
+          <p className="text-sage-500 dark:text-sage-400 text-sm font-medium">
             {mode === 'image' ? 'AI가 약을 분석하고 있습니다...' : '검색 중...'}
           </p>
         </div>
@@ -471,7 +473,7 @@ export default function SearchPage() {
       {/* 결과 */}
       {!loading && results.length > 0 && (
         <div className="space-y-3">
-          <p className="text-sm font-semibold text-sage-500 px-1">검색 결과 <span className="text-mint-600">{results.length}개</span></p>
+          <p className="text-sm font-semibold text-sage-500 dark:text-sage-400 px-1">검색 결과 <span className="text-mint-600 dark:text-mint-400">{results.length}개</span></p>
           {results.map(med => (
             <MedicationCard key={med.id} medication={med} showAddButton />
           ))}

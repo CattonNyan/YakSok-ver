@@ -67,10 +67,10 @@ export default function ChatPage() {
             <Sparkles className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-sage-900 tracking-tight">AI 상담</h1>
+            <h1 className="text-2xl font-bold text-sage-900 dark:text-sage-50 tracking-tight">AI 상담</h1>
             <p className="text-sm text-sage-400">약에 관한 궁금한 점을 물어보세요</p>
           </div>
-          <div className="ml-auto flex items-center gap-1.5 text-xs text-mint-600 bg-mint-50 border border-mint-100 px-3 py-1.5 rounded-full font-semibold">
+          <div className="ml-auto flex items-center gap-1.5 text-xs text-mint-600 dark:text-mint-400 bg-mint-50 dark:bg-mint-900/20 border border-mint-100 dark:border-mint-800 px-3 py-1.5 rounded-full font-semibold">
             <span className="w-1.5 h-1.5 rounded-full bg-mint-500 animate-pulse" />
             온라인
           </div>
@@ -97,7 +97,7 @@ export default function ChatPage() {
             <div className={clsx(
               'max-w-[78%] px-4 py-3.5 text-sm leading-relaxed whitespace-pre-line',
               m.role === 'assistant'
-                ? 'bg-white border border-sage-100 shadow-sm text-sage-800 rounded-3xl rounded-bl-lg'
+                ? 'bg-white dark:bg-sage-800 border border-sage-100 dark:border-sage-700 shadow-sm text-sage-800 dark:text-sage-100 rounded-3xl rounded-bl-lg'
                 : 'bg-mint-500 text-white rounded-3xl rounded-br-lg'
             )}>
               {m.content}
@@ -111,7 +111,7 @@ export default function ChatPage() {
             <div className="w-8 h-8 rounded-2xl bg-gradient-to-br from-mint-400 to-mint-600 flex items-center justify-center shrink-0">
               <Bot className="w-4 h-4 text-white" />
             </div>
-            <div className="bg-white border border-sage-100 shadow-sm px-5 py-3.5 rounded-3xl rounded-bl-lg flex items-center gap-2.5">
+            <div className="bg-white dark:bg-sage-800 border border-sage-100 dark:border-sage-700 shadow-sm px-5 py-3.5 rounded-3xl rounded-bl-lg flex items-center gap-2.5">
               <div className="flex gap-1">
                 {[0, 1, 2].map(i => (
                   <div
@@ -137,7 +137,7 @@ export default function ChatPage() {
               <button
                 key={q}
                 onClick={() => setInput(q)}
-                className="shrink-0 text-xs bg-white border border-sage-200 text-sage-600 px-3.5 py-2 rounded-2xl hover:border-mint-300 hover:text-mint-700 hover:bg-mint-50 transition-all font-medium whitespace-nowrap shadow-sm"
+                className="shrink-0 text-xs bg-white dark:bg-sage-800 border border-sage-200 dark:border-sage-600 text-sage-600 dark:text-sage-300 px-3.5 py-2 rounded-2xl hover:border-mint-300 hover:text-mint-700 dark:hover:text-mint-400 hover:bg-mint-50 dark:hover:bg-mint-900/20 transition-all font-medium whitespace-nowrap shadow-sm"
               >
                 {q}
               </button>

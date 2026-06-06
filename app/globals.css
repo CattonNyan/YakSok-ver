@@ -9,7 +9,7 @@
 @layer base {
   * { box-sizing: border-box; }
   html { font-family: 'Pretendard Variable', sans-serif; }
-  body { @apply bg-sage-50 text-sage-900; }
+  body { @apply bg-sage-50 text-sage-900 dark:bg-sage-950 dark:text-sage-50; }
 }
 
 @layer components {
@@ -17,19 +17,24 @@
     @apply bg-mint-500 hover:bg-mint-600 text-white font-medium px-4 py-2.5 rounded-xl transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
   }
   .btn-secondary {
-    @apply bg-white hover:bg-sage-50 text-sage-700 font-medium px-4 py-2.5 rounded-xl border border-sage-200 transition-colors duration-200;
+    @apply bg-white hover:bg-sage-50 text-sage-700 font-medium px-4 py-2.5 rounded-xl border border-sage-200 transition-colors duration-200
+           dark:bg-sage-800 dark:hover:bg-sage-700 dark:text-sage-200 dark:border-sage-600;
   }
   .card {
-    @apply bg-white rounded-2xl shadow-sm border border-sage-100 p-5;
+    @apply bg-white rounded-2xl shadow-sm border border-sage-100 p-5
+           dark:bg-sage-800 dark:border-sage-700;
   }
   .input-base {
-    @apply w-full px-4 py-3 rounded-xl border border-sage-200 bg-white text-sage-900 placeholder-sage-400 focus:outline-none focus:ring-2 focus:ring-mint-400 focus:border-transparent transition-all;
+    @apply w-full px-4 py-3 rounded-xl border border-sage-200 bg-white text-sage-900 placeholder-sage-400 focus:outline-none focus:ring-2 focus:ring-mint-400 focus:border-transparent transition-all
+           dark:bg-sage-800 dark:border-sage-700 dark:text-sage-100 dark:placeholder-sage-500 dark:focus:ring-mint-500;
   }
   .badge-taken {
-    @apply inline-flex items-center gap-1 bg-mint-50 text-mint-700 text-xs font-medium px-2 py-0.5 rounded-full;
+    @apply inline-flex items-center gap-1 bg-mint-50 text-mint-700 text-xs font-medium px-2 py-0.5 rounded-full
+           dark:bg-mint-900/30 dark:text-mint-400;
   }
   .badge-pending {
-    @apply inline-flex items-center gap-1 bg-sage-100 text-sage-500 text-xs font-medium px-2 py-0.5 rounded-full;
+    @apply inline-flex items-center gap-1 bg-sage-100 text-sage-500 text-xs font-medium px-2 py-0.5 rounded-full
+           dark:bg-sage-700 dark:text-sage-400;
   }
 }
 
@@ -47,7 +52,7 @@
 /* 스크롤바 */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { @apply bg-sage-200 rounded-full; }
+::-webkit-scrollbar-thumb { @apply bg-sage-200 rounded-full dark:bg-sage-700; }
 
 /* 약물 상호작용 심각도 색상 */
 .severity-low { @apply text-mint-600 bg-mint-50; }

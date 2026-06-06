@@ -37,7 +37,7 @@ function PasswordStrength({ password }: { password: string }) {
             className={`h-1 flex-1 rounded-full transition-all duration-300 ${
               i < level
                 ? strong ? 'bg-mint-500' : 'bg-amber-400'
-                : 'bg-sage-100'
+                : 'bg-sage-100 dark:bg-sage-700'
             }`}
           />
         ))}
@@ -93,13 +93,13 @@ export default function SignupPage() {
     >
       {/* 헤더 */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-sage-900 tracking-tight mb-2">시작해볼까요</h1>
+        <h1 className="text-3xl font-bold text-sage-900 dark:text-sage-50 tracking-tight mb-2">시작해볼까요</h1>
         <p className="text-sage-400">약속과 함께 건강한 복약 습관을 만들어보세요</p>
       </div>
 
       <form onSubmit={handleSignup} className="space-y-4">
         <div>
-          <label className="block text-sm font-semibold text-sage-700 mb-1.5">이름</label>
+          <label className="block text-sm font-semibold text-sage-700 dark:text-sage-300 mb-1.5">이름</label>
           <input
             type="text"
             value={name}
@@ -111,7 +111,7 @@ export default function SignupPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-sage-700 mb-1.5">이메일</label>
+          <label className="block text-sm font-semibold text-sage-700 dark:text-sage-300 mb-1.5">이메일</label>
           <input
             type="email"
             value={email}
@@ -123,7 +123,7 @@ export default function SignupPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-sage-700 mb-1.5">비밀번호</label>
+          <label className="block text-sm font-semibold text-sage-700 dark:text-sage-300 mb-1.5">비밀번호</label>
           <div className="relative">
             <input
               type={showPw ? 'text' : 'password'}
@@ -138,7 +138,7 @@ export default function SignupPage() {
               type="button"
               onClick={() => setShowPw(!showPw)}
               aria-label={showPw ? '비밀번호 숨기기' : '비밀번호 표시'}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-sage-400 hover:text-sage-600 p-1 min-w-[36px] min-h-[36px] flex items-center justify-center"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-sage-400 hover:text-sage-600 dark:hover:text-sage-200 p-1 min-w-[36px] min-h-[36px] flex items-center justify-center"
             >
               {showPw ? <EyeOff className="w-5 h-5" aria-hidden /> : <Eye className="w-5 h-5" aria-hidden />}
             </button>
@@ -161,13 +161,13 @@ export default function SignupPage() {
 
       <p className="text-center text-xs text-sage-400 mt-4 leading-relaxed">
         가입하면{' '}
-        <span className="text-sage-500 underline cursor-pointer">이용약관</span> 및{' '}
-        <span className="text-sage-500 underline cursor-pointer">개인정보처리방침</span>에 동의하게 됩니다
+        <span className="text-sage-500 dark:text-sage-400 underline cursor-pointer">이용약관</span> 및{' '}
+        <span className="text-sage-500 dark:text-sage-400 underline cursor-pointer">개인정보처리방침</span>에 동의하게 됩니다
       </p>
 
-      <p className="text-center text-sm text-sage-500 mt-4">
+      <p className="text-center text-sm text-sage-500 dark:text-sage-400 mt-4">
         이미 계정이 있으신가요?{' '}
-        <Link href="/auth/login" className="text-mint-600 font-semibold hover:text-mint-700 transition-colors">
+        <Link href="/auth/login" className="text-mint-600 dark:text-mint-400 font-semibold hover:text-mint-700 transition-colors">
           로그인
         </Link>
       </p>

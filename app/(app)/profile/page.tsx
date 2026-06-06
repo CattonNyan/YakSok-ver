@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic'
 import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
-import { Loader2, Camera, Plus, X, User, Activity, ChevronRight } from 'lucide-react'
+import { Loader2, Camera, Plus, X, User, Activity } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import DatePicker from '@/components/ui/DatePicker'
 import clsx from 'clsx'
@@ -16,12 +16,12 @@ const CONDITIONS = [
 
 function Section({ icon: Icon, title, children }: { icon: React.ElementType; title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white rounded-3xl border border-sage-100 shadow-sm overflow-hidden">
-      <div className="flex items-center gap-2.5 px-6 py-4 border-b border-sage-50">
-        <div className="w-7 h-7 bg-mint-50 rounded-xl flex items-center justify-center">
-          <Icon className="w-3.5 h-3.5 text-mint-600" />
+    <div className="bg-white dark:bg-sage-800 rounded-3xl border border-sage-100 dark:border-sage-700 shadow-sm overflow-hidden">
+      <div className="flex items-center gap-2.5 px-6 py-4 border-b border-sage-50 dark:border-sage-700">
+        <div className="w-7 h-7 bg-mint-50 dark:bg-mint-900/20 rounded-xl flex items-center justify-center">
+          <Icon className="w-3.5 h-3.5 text-mint-600 dark:text-mint-400" />
         </div>
-        <p className="font-bold text-sage-800 text-sm">{title}</p>
+        <p className="font-bold text-sage-800 dark:text-sage-200 text-sm">{title}</p>
       </div>
       <div className="p-6">{children}</div>
     </div>
@@ -137,17 +137,17 @@ export default function ProfilePage() {
       {/* 헤더 */}
       <div>
         <p className="text-xs font-bold text-mint-600 tracking-widest uppercase mb-1">Account</p>
-        <h1 className="text-3xl font-bold text-sage-900 tracking-tight">프로필</h1>
+        <h1 className="text-3xl font-bold text-sage-900 dark:text-sage-50 tracking-tight">프로필</h1>
         <p className="text-sage-400 mt-1">개인 정보를 관리하세요</p>
       </div>
 
       {/* 아바타 */}
-      <div className="bg-white rounded-3xl border border-sage-100 shadow-sm p-8 flex flex-col items-center gap-4">
+      <div className="bg-white dark:bg-sage-800 rounded-3xl border border-sage-100 dark:border-sage-700 shadow-sm p-8 flex flex-col items-center gap-4">
         <div className="relative">
-          <div className="w-24 h-24 rounded-3xl bg-sage-100 overflow-hidden flex items-center justify-center ring-4 ring-sage-50">
+          <div className="w-24 h-24 rounded-3xl bg-sage-100 dark:bg-sage-700 overflow-hidden flex items-center justify-center ring-4 ring-sage-50 dark:ring-sage-900">
             {avatarUrl
               ? <img src={avatarUrl} alt="프로필" className="w-full h-full object-cover" />
-              : <User className="w-10 h-10 text-sage-300" />}
+              : <User className="w-10 h-10 text-sage-300 dark:text-sage-500" />}
           </div>
           <button
             onClick={() => fileRef.current?.click()}
@@ -159,7 +159,7 @@ export default function ProfilePage() {
         </div>
         <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
         <div className="text-center">
-          <p className="font-bold text-sage-900">{name || '이름 없음'}</p>
+          <p className="font-bold text-sage-900 dark:text-sage-50">{name || '이름 없음'}</p>
           <p className="text-sm text-sage-400">{email}</p>
         </div>
         <p className="text-xs text-sage-400">JPG, PNG · 최대 2MB</p>
@@ -169,19 +169,19 @@ export default function ProfilePage() {
       <Section icon={User} title="기본 정보">
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-sage-700 mb-1.5">이메일</label>
-            <input value={email} disabled className="input-base bg-sage-50 text-sage-400 cursor-not-allowed" />
+            <label className="block text-sm font-semibold text-sage-700 dark:text-sage-300 mb-1.5">이메일</label>
+            <input value={email} disabled className="input-base bg-sage-50 dark:bg-sage-700 text-sage-400 cursor-not-allowed" />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-sage-700 mb-1.5">이름 <span className="text-red-400">*</span></label>
+            <label className="block text-sm font-semibold text-sage-700 dark:text-sage-300 mb-1.5">이름 <span className="text-red-400">*</span></label>
             <input value={name} onChange={e => setName(e.target.value)} placeholder="홍길동" className="input-base" />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-sage-700 mb-1.5">생년월일</label>
+            <label className="block text-sm font-semibold text-sage-700 dark:text-sage-300 mb-1.5">생년월일</label>
             <DatePicker value={birthDate} onChange={setBirthDate} placeholder="생년월일을 선택하세요" />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-sage-700 mb-2">성별</label>
+            <label className="block text-sm font-semibold text-sage-700 dark:text-sage-300 mb-2">성별</label>
             <div className="flex gap-2">
               {[{ value: 'male', label: '남성' }, { value: 'female', label: '여성' }, { value: 'other', label: '기타' }].map(({ value, label }) => (
                 <button
@@ -190,8 +190,8 @@ export default function ProfilePage() {
                   className={clsx(
                     'flex-1 py-2.5 rounded-2xl border-2 text-sm font-semibold transition-all',
                     gender === value
-                      ? 'bg-mint-50 border-mint-300 text-mint-700'
-                      : 'bg-white border-sage-100 text-sage-500 hover:border-sage-200'
+                      ? 'bg-mint-50 dark:bg-mint-900/20 border-mint-300 text-mint-700 dark:text-mint-400'
+                      : 'bg-white dark:bg-sage-800 border-sage-100 dark:border-sage-600 text-sage-500 dark:text-sage-400 hover:border-sage-200 dark:hover:border-sage-500'
                   )}
                 >
                   {label}
@@ -201,12 +201,12 @@ export default function ProfilePage() {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-semibold text-sage-700 mb-1.5">키 (cm)</label>
+              <label className="block text-sm font-semibold text-sage-700 dark:text-sage-300 mb-1.5">키 (cm)</label>
               <input type="number" value={height} onChange={e => setHeight(e.target.value)}
                 placeholder="170" min="100" max="250" className="input-base" />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-sage-700 mb-1.5">몸무게 (kg)</label>
+              <label className="block text-sm font-semibold text-sage-700 dark:text-sage-300 mb-1.5">몸무게 (kg)</label>
               <input type="number" value={weight} onChange={e => setWeight(e.target.value)}
                 placeholder="65" min="20" max="300" className="input-base" />
             </div>
@@ -225,8 +225,8 @@ export default function ProfilePage() {
                 className={clsx(
                   'px-3 py-1.5 rounded-2xl text-sm font-medium border-2 transition-all',
                   conditions.includes(c)
-                    ? 'bg-mint-50 border-mint-300 text-mint-700'
-                    : 'bg-white border-sage-100 text-sage-500 hover:border-sage-200'
+                    ? 'bg-mint-50 dark:bg-mint-900/20 border-mint-300 text-mint-700 dark:text-mint-400'
+                    : 'bg-white dark:bg-sage-800 border-sage-100 dark:border-sage-600 text-sage-500 dark:text-sage-400 hover:border-sage-200 dark:hover:border-sage-500'
                 )}
               >
                 {conditions.includes(c) && '✓ '}{c}
@@ -253,7 +253,7 @@ export default function ProfilePage() {
           {customConditions.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {customConditions.map(c => (
-                <span key={c} className="inline-flex items-center gap-1.5 bg-sage-100 text-sage-700 text-sm px-3 py-1.5 rounded-2xl font-medium">
+                <span key={c} className="inline-flex items-center gap-1.5 bg-sage-100 dark:bg-sage-700 text-sage-700 dark:text-sage-300 text-sm px-3 py-1.5 rounded-2xl font-medium">
                   {c}
                   <button onClick={() => toggleCondition(c)} className="hover:text-red-400 transition-colors">
                     <X className="w-3 h-3" />

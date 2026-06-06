@@ -10,11 +10,11 @@ import type { Schedule, MedicationLog, TimeSlot } from '@/types'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
 
-const TIME_SLOTS: { slot: TimeSlot; label: string; icon: React.ElementType; color: string; bg: string }[] = [
-  { slot: 'morning', label: '아침',    icon: Sun,     color: 'text-amber-500',  bg: 'bg-amber-50' },
-  { slot: 'lunch',   label: '점심',    icon: Coffee,  color: 'text-orange-500', bg: 'bg-orange-50' },
-  { slot: 'dinner',  label: '저녁',    icon: Sunset,  color: 'text-purple-500', bg: 'bg-purple-50' },
-  { slot: 'bedtime', label: '취침 전', icon: Moon,    color: 'text-blue-500',   bg: 'bg-blue-50' },
+const TIME_SLOTS: { slot: TimeSlot; label: string; icon: React.ElementType; color: string; bg: string; darkBg: string }[] = [
+  { slot: 'morning', label: '아침',    icon: Sun,     color: 'text-amber-500',  bg: 'bg-amber-50',  darkBg: 'dark:bg-amber-900/20' },
+  { slot: 'lunch',   label: '점심',    icon: Coffee,  color: 'text-orange-500', bg: 'bg-orange-50', darkBg: 'dark:bg-orange-900/20' },
+  { slot: 'dinner',  label: '저녁',    icon: Sunset,  color: 'text-purple-500', bg: 'bg-purple-50', darkBg: 'dark:bg-purple-900/20' },
+  { slot: 'bedtime', label: '취침 전', icon: Moon,    color: 'text-blue-500',   bg: 'bg-blue-50',   darkBg: 'dark:bg-blue-900/20' },
 ]
 
 type MedicationInfo = { item_name: string; entp_name?: string }
@@ -99,14 +99,14 @@ export default function DashboardClient({ schedules, logs: initialLogs, userName
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm font-medium text-sage-400 mb-1">{dateLabel}</p>
-          <h1 className="text-3xl font-bold text-sage-900 tracking-tight">
+          <h1 className="text-3xl font-bold text-sage-900 dark:text-sage-50 tracking-tight">
             {userName ? `${userName}님,` : ''} 안녕하세요 👋
           </h1>
         </div>
         {totalDoses > 0 && (
-          <div className="flex items-center gap-2 bg-white rounded-2xl px-4 py-2.5 border border-sage-100 shadow-sm flex-shrink-0">
+          <div className="flex items-center gap-2 bg-white dark:bg-sage-800 rounded-2xl px-4 py-2.5 border border-sage-100 dark:border-sage-700 shadow-sm flex-shrink-0">
             <span className={cn('w-2 h-2 rounded-full', rate === 100 ? 'bg-mint-500' : 'bg-amber-400')} />
-            <span className="text-sm font-semibold text-sage-700">{takenDoses}/{totalDoses} 완료</span>
+            <span className="text-sm font-semibold text-sage-700 dark:text-sage-200">{takenDoses}/{totalDoses} 완료</span>
           </div>
         )}
       </div>
@@ -135,11 +135,11 @@ export default function DashboardClient({ schedules, logs: initialLogs, userName
 
       {/* ── 빈 상태 ── */}
       {schedules.length === 0 ? (
-        <div className="bg-white rounded-3xl border border-sage-100 p-12 text-center shadow-sm">
-          <div className="w-16 h-16 bg-mint-50 rounded-3xl flex items-center justify-center mx-auto mb-4">
+        <div className="bg-white dark:bg-sage-800 rounded-3xl border border-sage-100 dark:border-sage-700 p-12 text-center shadow-sm">
+          <div className="w-16 h-16 bg-mint-50 dark:bg-mint-900/20 rounded-3xl flex items-center justify-center mx-auto mb-4">
             <span className="text-3xl" role="img" aria-label="약">💊</span>
           </div>
-          <p className="font-semibold text-sage-700 mb-1">오늘 복용할 약이 없습니다</p>
+          <p className="font-semibold text-sage-700 dark:text-sage-200 mb-1">오늘 복용할 약이 없습니다</p>
           <p className="text-sage-400 text-sm mb-6">복약 일정을 등록하고 관리를 시작해보세요</p>
           <div className="flex items-center justify-center gap-3">
             <Link
@@ -151,7 +151,7 @@ export default function DashboardClient({ schedules, logs: initialLogs, userName
             </Link>
             <Link
               href="/search"
-              className="inline-flex items-center gap-2 bg-white hover:bg-sage-50 text-sage-700 font-semibold px-5 py-2.5 rounded-2xl text-sm border border-sage-200 transition-colors"
+              className="inline-flex items-center gap-2 bg-white dark:bg-sage-700 hover:bg-sage-50 dark:hover:bg-sage-600 text-sage-700 dark:text-sage-200 font-semibold px-5 py-2.5 rounded-2xl text-sm border border-sage-200 dark:border-sage-600 transition-colors"
             >
               <Search className="w-4 h-4" />
               약 검색
@@ -160,7 +160,7 @@ export default function DashboardClient({ schedules, logs: initialLogs, userName
         </div>
       ) : (
         /* ── 시간대별 복약 카드 ── */
-        TIME_SLOTS.map(({ slot, label, icon: Icon, color, bg }) => {
+        TIME_SLOTS.map(({ slot, label, icon: Icon, color, bg, darkBg }) => {
           const slotSchedules = schedules.filter(s => s.time_slots.includes(slot))
           if (slotSchedules.length === 0) return null
 
@@ -170,22 +170,22 @@ export default function DashboardClient({ schedules, logs: initialLogs, userName
           return (
             <div
               key={slot}
-              className="bg-white rounded-3xl border border-sage-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200"
+              className="bg-white dark:bg-sage-800 rounded-3xl border border-sage-100 dark:border-sage-700 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200"
             >
               {/* 슬롯 헤더 */}
-              <div className="flex items-center justify-between px-6 py-4 border-b border-sage-50">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-sage-50 dark:border-sage-700">
                 <div className="flex items-center gap-3">
-                  <div className={cn('w-9 h-9 rounded-2xl flex items-center justify-center', bg)}>
+                  <div className={cn('w-9 h-9 rounded-2xl flex items-center justify-center', bg, darkBg)}>
                     <Icon className={cn('w-4.5 h-4.5', color)} aria-hidden />
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-sage-900">{label}</span>
-                    <span className="text-xs text-sage-400 bg-sage-50 px-2 py-0.5 rounded-full">{slotSchedules.length}종</span>
+                    <span className="font-bold text-sage-900 dark:text-sage-50">{label}</span>
+                    <span className="text-xs text-sage-400 bg-sage-50 dark:bg-sage-700 dark:text-sage-300 px-2 py-0.5 rounded-full">{slotSchedules.length}종</span>
                   </div>
                 </div>
 
                 {allTaken ? (
-                  <span className="text-xs font-semibold text-mint-600 bg-mint-50 border border-mint-100 px-3 py-1 rounded-full">
+                  <span className="text-xs font-semibold text-mint-600 bg-mint-50 dark:bg-mint-900/20 dark:text-mint-400 border border-mint-100 dark:border-mint-800 px-3 py-1 rounded-full">
                     ✓ 모두 완료
                   </span>
                 ) : (
@@ -209,8 +209,8 @@ export default function DashboardClient({ schedules, logs: initialLogs, userName
                       className={cn(
                         'w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl border-2 transition-all duration-200 text-left group',
                         taken
-                          ? 'border-mint-200 bg-mint-50/60'
-                          : 'border-transparent bg-sage-50 hover:bg-sage-100 hover:border-sage-200'
+                          ? 'border-mint-200 dark:border-mint-700 bg-mint-50/60 dark:bg-mint-900/20'
+                          : 'border-transparent bg-sage-50 dark:bg-sage-700/50 hover:bg-sage-100 dark:hover:bg-sage-700 hover:border-sage-200 dark:hover:border-sage-600'
                       )}
                     >
                       {/* 체크 원 */}
@@ -218,7 +218,7 @@ export default function DashboardClient({ schedules, logs: initialLogs, userName
                         'w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all duration-200',
                         taken
                           ? 'border-mint-500 bg-mint-500'
-                          : 'border-sage-300 bg-white group-hover:border-mint-400'
+                          : 'border-sage-300 dark:border-sage-500 bg-white dark:bg-sage-700 group-hover:border-mint-400'
                       )}>
                         {taken && <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} aria-hidden />}
                       </div>
@@ -227,7 +227,7 @@ export default function DashboardClient({ schedules, logs: initialLogs, userName
                       <div className="flex-1 min-w-0">
                         <p className={cn(
                           'font-semibold text-sm truncate transition-all',
-                          taken ? 'text-mint-600 line-through decoration-mint-300' : 'text-sage-800'
+                          taken ? 'text-mint-600 dark:text-mint-400 line-through decoration-mint-300' : 'text-sage-800 dark:text-sage-100'
                         )}>
                           {getMedication(s)?.item_name}
                         </p>
@@ -239,7 +239,7 @@ export default function DashboardClient({ schedules, logs: initialLogs, userName
                       {/* 상태 레이블 */}
                       <span className={cn(
                         'text-xs font-semibold flex-shrink-0 transition-colors',
-                        taken ? 'text-mint-500' : 'text-sage-300 group-hover:text-sage-400'
+                        taken ? 'text-mint-500 dark:text-mint-400' : 'text-sage-300 dark:text-sage-500 group-hover:text-sage-400'
                       )}>
                         {taken ? '완료' : '미복용'}
                       </span>
@@ -257,21 +257,21 @@ export default function DashboardClient({ schedules, logs: initialLogs, userName
         <div className="grid grid-cols-2 gap-3 pt-2">
           <Link
             href="/schedule/new"
-            className="flex items-center gap-3 bg-white hover:bg-sage-50 border border-sage-100 rounded-2xl px-4 py-3.5 transition-colors group shadow-sm"
+            className="flex items-center gap-3 bg-white dark:bg-sage-800 hover:bg-sage-50 dark:hover:bg-sage-700 border border-sage-100 dark:border-sage-700 rounded-2xl px-4 py-3.5 transition-colors group shadow-sm"
           >
-            <div className="w-8 h-8 bg-mint-50 rounded-xl flex items-center justify-center group-hover:bg-mint-100 transition-colors">
-              <CalendarPlus className="w-4 h-4 text-mint-600" aria-hidden />
+            <div className="w-8 h-8 bg-mint-50 dark:bg-mint-900/20 rounded-xl flex items-center justify-center group-hover:bg-mint-100 dark:group-hover:bg-mint-900/30 transition-colors">
+              <CalendarPlus className="w-4 h-4 text-mint-600 dark:text-mint-400" aria-hidden />
             </div>
-            <span className="text-sm font-semibold text-sage-700">일정 추가</span>
+            <span className="text-sm font-semibold text-sage-700 dark:text-sage-200">일정 추가</span>
           </Link>
           <Link
             href="/search"
-            className="flex items-center gap-3 bg-white hover:bg-sage-50 border border-sage-100 rounded-2xl px-4 py-3.5 transition-colors group shadow-sm"
+            className="flex items-center gap-3 bg-white dark:bg-sage-800 hover:bg-sage-50 dark:hover:bg-sage-700 border border-sage-100 dark:border-sage-700 rounded-2xl px-4 py-3.5 transition-colors group shadow-sm"
           >
-            <div className="w-8 h-8 bg-sage-50 rounded-xl flex items-center justify-center group-hover:bg-sage-100 transition-colors">
-              <Search className="w-4 h-4 text-sage-500" aria-hidden />
+            <div className="w-8 h-8 bg-sage-50 dark:bg-sage-700 rounded-xl flex items-center justify-center group-hover:bg-sage-100 dark:group-hover:bg-sage-600 transition-colors">
+              <Search className="w-4 h-4 text-sage-500 dark:text-sage-400" aria-hidden />
             </div>
-            <span className="text-sm font-semibold text-sage-700">약 검색</span>
+            <span className="text-sm font-semibold text-sage-700 dark:text-sage-200">약 검색</span>
           </Link>
         </div>
       )}

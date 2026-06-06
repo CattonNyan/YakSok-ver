@@ -52,7 +52,7 @@ export default function LoginPage() {
     >
       {/* 헤더 */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-sage-900 tracking-tight mb-2">다시 오셨군요</h1>
+        <h1 className="text-3xl font-bold text-sage-900 dark:text-sage-50 tracking-tight mb-2">다시 오셨군요</h1>
         <p className="text-sage-400">복약 관리를 계속해보세요</p>
       </div>
 
@@ -60,7 +60,7 @@ export default function LoginPage() {
       <div className="space-y-2.5 mb-6">
         <button
           onClick={() => handleSocialLogin('google')}
-          className="w-full flex items-center justify-center gap-3 py-3.5 px-4 rounded-2xl border border-sage-200 bg-white hover:bg-sage-50 hover:border-sage-300 transition-all duration-150 text-sm font-medium text-sage-700 shadow-sm"
+          className="w-full flex items-center justify-center gap-3 py-3.5 px-4 rounded-2xl border border-sage-200 dark:border-sage-600 bg-white dark:bg-sage-800 hover:bg-sage-50 dark:hover:bg-sage-700 hover:border-sage-300 dark:hover:border-sage-500 transition-all duration-150 text-sm font-medium text-sage-700 dark:text-sage-200 shadow-sm"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -85,17 +85,17 @@ export default function LoginPage() {
       {/* 구분선 */}
       <div className="relative mb-6">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-sage-100" />
+          <div className="w-full border-t border-sage-100 dark:border-sage-700" />
         </div>
         <div className="relative flex justify-center text-xs">
-          <span className="bg-[#f7fdf9] px-3 text-sage-400 font-medium">또는 이메일로</span>
+          <span className="bg-[#f7fdf9] dark:bg-sage-950 px-3 text-sage-400 font-medium">또는 이메일로</span>
         </div>
       </div>
 
       {/* 이메일 폼 */}
       <form onSubmit={handleLogin} className="space-y-4">
         <div>
-          <label className="block text-sm font-semibold text-sage-700 mb-1.5">이메일</label>
+          <label className="block text-sm font-semibold text-sage-700 dark:text-sage-300 mb-1.5">이메일</label>
           <input
             type="email"
             value={email}
@@ -108,7 +108,7 @@ export default function LoginPage() {
 
         <div>
           <div className="flex items-center justify-between mb-1.5">
-            <label className="block text-sm font-semibold text-sage-700">비밀번호</label>
+            <label className="block text-sm font-semibold text-sage-700 dark:text-sage-300">비밀번호</label>
           </div>
           <div className="relative">
             <input
@@ -123,7 +123,7 @@ export default function LoginPage() {
               type="button"
               onClick={() => setShowPw(!showPw)}
               aria-label={showPw ? '비밀번호 숨기기' : '비밀번호 표시'}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-sage-400 hover:text-sage-600 p-1 min-w-[36px] min-h-[36px] flex items-center justify-center"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-sage-400 hover:text-sage-600 dark:hover:text-sage-200 p-1 min-w-[36px] min-h-[36px] flex items-center justify-center"
             >
               {showPw ? <EyeOff className="w-5 h-5" aria-hidden /> : <Eye className="w-5 h-5" aria-hidden />}
             </button>
@@ -143,9 +143,9 @@ export default function LoginPage() {
         </button>
       </form>
 
-      <p className="text-center text-sm text-sage-500 mt-6">
+      <p className="text-center text-sm text-sage-500 dark:text-sage-400 mt-6">
         계정이 없으신가요?{' '}
-        <Link href="/auth/signup" className="text-mint-600 font-semibold hover:text-mint-700 transition-colors">
+        <Link href="/auth/signup" className="text-mint-600 dark:text-mint-400 font-semibold hover:text-mint-700 transition-colors">
           회원가입
         </Link>
       </p>

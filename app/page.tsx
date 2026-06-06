@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Pill, Camera, CalendarDays, ShieldAlert, Bot, ArrowRight, Check } from 'lucide-react'
 import { AnimatedSection } from '@/components/ui/AnimatedSection'
+import ThemeToggle from '@/components/ui/ThemeToggle'
 
 const STEPS = [
   {
@@ -55,33 +56,34 @@ const VALUES = [
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-[#f7fdf9] overflow-x-hidden">
+    <main className="min-h-screen bg-[#f7fdf9] dark:bg-sage-950 overflow-x-hidden">
       {/* 배경 블러 오브 */}
       <div className="fixed inset-0 pointer-events-none -z-10">
-        <div className="absolute top-[-15%] right-[-10%] w-[700px] h-[700px] bg-mint-200/25 rounded-full blur-[140px]" />
-        <div className="absolute bottom-[5%] left-[-15%] w-[600px] h-[600px] bg-sage-200/20 rounded-full blur-[120px]" />
-        <div className="absolute top-[50%] left-[40%] w-[400px] h-[400px] bg-mint-100/20 rounded-full blur-[100px]" />
+        <div className="absolute top-[-15%] right-[-10%] w-[700px] h-[700px] bg-mint-200/25 dark:bg-mint-900/10 rounded-full blur-[140px]" />
+        <div className="absolute bottom-[5%] left-[-15%] w-[600px] h-[600px] bg-sage-200/20 dark:bg-sage-800/15 rounded-full blur-[120px]" />
+        <div className="absolute top-[50%] left-[40%] w-[400px] h-[400px] bg-mint-100/20 dark:bg-mint-900/10 rounded-full blur-[100px]" />
       </div>
 
       {/* 헤더 */}
-      <header className="sticky top-0 z-50 backdrop-blur-xl bg-white/60 border-b border-sage-100/60">
+      <header className="sticky top-0 z-50 backdrop-blur-xl bg-white/60 dark:bg-sage-900/80 border-b border-sage-100/60 dark:border-sage-700/60">
         <div className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 bg-gradient-to-br from-mint-400 to-mint-600 rounded-xl flex items-center justify-center shadow-sm shadow-mint-500/30">
               <Pill className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-sage-900 tracking-tight">약속</span>
+            <span className="text-xl font-bold text-sage-900 dark:text-white tracking-tight">약속</span>
           </div>
 
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-sage-500">
-            <Link href="/search" className="hover:text-mint-600 transition-colors duration-150">의약품 검색</Link>
-            <Link href="/auth/signup" className="hover:text-mint-600 transition-colors duration-150">복약 관리</Link>
+          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-sage-500 dark:text-sage-400">
+            <Link href="/search" className="hover:text-mint-600 dark:hover:text-mint-400 transition-colors duration-150">의약품 검색</Link>
+            <Link href="/auth/signup" className="hover:text-mint-600 dark:hover:text-mint-400 transition-colors duration-150">복약 관리</Link>
           </nav>
 
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             <Link
               href="/auth/login"
-              className="text-sm font-medium text-sage-600 px-4 py-2 rounded-xl hover:bg-sage-100 transition-colors duration-150"
+              className="text-sm font-medium text-sage-600 dark:text-sage-300 px-4 py-2 rounded-xl hover:bg-sage-100 dark:hover:bg-sage-800 transition-colors duration-150"
             >
               로그인
             </Link>
@@ -98,12 +100,12 @@ export default function HomePage() {
       {/* 히어로 */}
       <section className="relative max-w-6xl mx-auto px-6 pt-20 pb-24">
         <div className="max-w-2xl">
-          <div className="inline-flex items-center gap-2 bg-mint-500/10 text-mint-700 text-sm font-semibold px-4 py-1.5 rounded-full mb-8 border border-mint-300/40">
+          <div className="inline-flex items-center gap-2 bg-mint-500/10 text-mint-700 dark:text-mint-400 text-sm font-semibold px-4 py-1.5 rounded-full mb-8 border border-mint-300/40 dark:border-mint-700/40">
             <span className="w-1.5 h-1.5 bg-mint-500 rounded-full animate-pulse" />
             AI 기반 스마트 복약 관리
           </div>
 
-          <h1 className="text-6xl font-bold text-sage-900 leading-[1.08] tracking-tight mb-6">
+          <h1 className="text-6xl font-bold text-sage-900 dark:text-sage-50 leading-[1.08] tracking-tight mb-6">
             약 관리,<br />
             이제{' '}
             <span className="bg-gradient-to-r from-mint-500 to-mint-700 bg-clip-text text-transparent">
@@ -127,7 +129,7 @@ export default function HomePage() {
             </Link>
             <Link
               href="/auth/signup"
-              className="inline-flex items-center gap-2 bg-white hover:bg-sage-50 text-sage-700 font-semibold px-6 py-3.5 rounded-2xl border border-sage-200 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 shadow-sm"
+              className="inline-flex items-center gap-2 bg-white dark:bg-sage-800 hover:bg-sage-50 dark:hover:bg-sage-700 text-sage-700 dark:text-sage-200 font-semibold px-6 py-3.5 rounded-2xl border border-sage-200 dark:border-sage-600 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 shadow-sm"
             >
               무료로 시작하기
             </Link>
@@ -136,8 +138,8 @@ export default function HomePage() {
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
             {['복약 알림 100% 무료', '약물 상호작용 자동 감지', 'AI 챗봇 24/7'].map((text) => (
               <div key={text} className="flex items-center gap-1.5 text-sm text-sage-400">
-                <div className="w-4 h-4 rounded-full bg-mint-100 flex items-center justify-center flex-shrink-0">
-                  <Check className="w-2.5 h-2.5 text-mint-600" />
+                <div className="w-4 h-4 rounded-full bg-mint-100 dark:bg-mint-900/30 flex items-center justify-center flex-shrink-0">
+                  <Check className="w-2.5 h-2.5 text-mint-600 dark:text-mint-400" />
                 </div>
                 {text}
               </div>
@@ -147,42 +149,42 @@ export default function HomePage() {
 
         {/* 우측 미리보기 카드 (데스크탑) */}
         <div className="absolute right-6 top-1/2 -translate-y-1/2 hidden lg:flex flex-col gap-3 w-72">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-xl shadow-sage-200/40 border border-sage-100">
+          <div className="bg-white/80 dark:bg-sage-800/80 backdrop-blur-sm rounded-2xl p-4 shadow-xl shadow-sage-200/40 dark:shadow-sage-900/40 border border-sage-100 dark:border-sage-700">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-9 h-9 bg-mint-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                <Pill className="w-4 h-4 text-mint-600" />
+              <div className="w-9 h-9 bg-mint-50 dark:bg-mint-900/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Pill className="w-4 h-4 text-mint-600 dark:text-mint-400" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs text-sage-400">오늘 복약</p>
-                <p className="text-sm font-semibold text-sage-800 truncate">타이레놀 500mg</p>
+                <p className="text-sm font-semibold text-sage-800 dark:text-sage-100 truncate">타이레놀 500mg</p>
               </div>
-              <span className="text-xs bg-mint-50 text-mint-700 px-2 py-0.5 rounded-full font-semibold border border-mint-100 flex-shrink-0">완료</span>
+              <span className="text-xs bg-mint-50 dark:bg-mint-900/20 text-mint-700 dark:text-mint-400 px-2 py-0.5 rounded-full font-semibold border border-mint-100 dark:border-mint-800 flex-shrink-0">완료</span>
             </div>
-            <div className="h-1.5 bg-sage-100 rounded-full overflow-hidden">
+            <div className="h-1.5 bg-sage-100 dark:bg-sage-700 rounded-full overflow-hidden">
               <div className="h-full w-3/4 bg-gradient-to-r from-mint-400 to-mint-500 rounded-full" />
             </div>
             <p className="text-xs text-sage-400 mt-1.5">오늘 3/4 복용 완료</p>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-xl shadow-sage-200/40 border border-sage-100">
+          <div className="bg-white/80 dark:bg-sage-800/80 backdrop-blur-sm rounded-2xl p-4 shadow-xl shadow-sage-200/40 dark:shadow-sage-900/40 border border-sage-100 dark:border-sage-700">
             <div className="flex items-center gap-2 mb-2">
-              <div className="w-7 h-7 bg-amber-50 rounded-lg flex items-center justify-center">
+              <div className="w-7 h-7 bg-amber-50 dark:bg-amber-900/20 rounded-lg flex items-center justify-center">
                 <ShieldAlert className="w-4 h-4 text-amber-500" />
               </div>
-              <span className="text-sm font-semibold text-sage-800">상호작용 주의</span>
+              <span className="text-sm font-semibold text-sage-800 dark:text-sage-100">상호작용 주의</span>
             </div>
-            <p className="text-xs text-sage-500 leading-relaxed">
+            <p className="text-xs text-sage-500 dark:text-sage-400 leading-relaxed">
               아스피린 + 이부프로펜 조합은 위장 출혈 위험이 있습니다.
             </p>
           </div>
 
-          <div className="bg-gradient-to-br from-mint-50 to-sage-50 rounded-2xl p-4 border border-mint-100">
+          <div className="bg-gradient-to-br from-mint-50 dark:from-mint-900/20 to-sage-50 dark:to-sage-800 rounded-2xl p-4 border border-mint-100 dark:border-mint-800">
             <div className="flex items-center gap-2 mb-1">
-              <Bot className="w-4 h-4 text-mint-600" />
-              <span className="text-xs font-semibold text-mint-700">AI 챗봇</span>
+              <Bot className="w-4 h-4 text-mint-600 dark:text-mint-400" />
+              <span className="text-xs font-semibold text-mint-700 dark:text-mint-400">AI 챗봇</span>
             </div>
-            <p className="text-xs text-sage-500 leading-relaxed">"타이레놀과 함께 복용하면 안 되는 약이 있나요?"</p>
-            <div className="mt-2 text-xs text-mint-600 font-medium">답변 작성 중...</div>
+            <p className="text-xs text-sage-500 dark:text-sage-400 leading-relaxed">"타이레놀과 함께 복용하면 안 되는 약이 있나요?"</p>
+            <div className="mt-2 text-xs text-mint-600 dark:text-mint-400 font-medium">답변 작성 중...</div>
           </div>
         </div>
       </section>
@@ -190,8 +192,8 @@ export default function HomePage() {
       {/* ── 서비스 소개 애니메이션: 3단계 ── */}
       <section className="max-w-6xl mx-auto px-6 pb-28">
         <AnimatedSection className="text-center mb-16">
-          <p className="text-xs font-bold text-mint-600 tracking-[0.2em] uppercase mb-3">How it works</p>
-          <h2 className="text-4xl font-bold text-sage-900 tracking-tight mb-3">3단계로 시작하세요</h2>
+          <p className="text-xs font-bold text-mint-600 dark:text-mint-400 tracking-[0.2em] uppercase mb-3">How it works</p>
+          <h2 className="text-4xl font-bold text-sage-900 dark:text-sage-50 tracking-tight mb-3">3단계로 시작하세요</h2>
           <p className="text-sage-400 text-lg">복잡한 약 관리, 이제 누구나 쉽게</p>
         </AnimatedSection>
 
@@ -210,12 +212,12 @@ export default function HomePage() {
                   <div className={`w-20 h-20 ${color} rounded-3xl flex items-center justify-center shadow-lg ${shadow}`}>
                     <Icon className="w-9 h-9 text-white" />
                   </div>
-                  <span className="absolute -top-2 -right-2 w-7 h-7 bg-white rounded-full border-2 border-sage-100 shadow-sm text-xs font-bold text-sage-500 flex items-center justify-center">
+                  <span className="absolute -top-2 -right-2 w-7 h-7 bg-white dark:bg-sage-800 rounded-full border-2 border-sage-100 dark:border-sage-700 shadow-sm text-xs font-bold text-sage-500 dark:text-sage-400 flex items-center justify-center">
                     {i + 1}
                   </span>
                 </div>
-                <p className="text-[11px] font-bold tracking-[0.15em] text-mint-500 uppercase mb-2">STEP {num}</p>
-                <h3 className="text-xl font-bold text-sage-900 mb-3">{title}</h3>
+                <p className="text-[11px] font-bold tracking-[0.15em] text-mint-500 dark:text-mint-400 uppercase mb-2">STEP {num}</p>
+                <h3 className="text-xl font-bold text-sage-900 dark:text-sage-50 mb-3">{title}</h3>
                 <p className="text-sage-400 text-sm leading-relaxed max-w-xs">{desc}</p>
               </div>
             </AnimatedSection>
@@ -237,12 +239,9 @@ export default function HomePage() {
             {VALUES.map(({ num, icon: Icon, title, desc, tag }, i) => (
               <AnimatedSection key={num} delay={i * 120}>
                 <div className="py-10 flex flex-col md:flex-row md:items-start gap-6 md:gap-10">
-                  {/* 번호 */}
                   <span className="text-5xl font-black text-sage-700 leading-none w-16 flex-shrink-0 select-none">
                     {num}
                   </span>
-
-                  {/* 텍스트 */}
                   <div className="flex-1">
                     <div className="flex flex-wrap items-center gap-3 mb-3">
                       <h3 className="text-2xl md:text-3xl font-bold text-white">{title}</h3>
@@ -252,8 +251,6 @@ export default function HomePage() {
                     </div>
                     <p className="text-sage-400 leading-relaxed max-w-2xl">{desc}</p>
                   </div>
-
-                  {/* 아이콘 */}
                   <div className="hidden md:flex w-12 h-12 bg-sage-800 rounded-2xl items-center justify-center flex-shrink-0 mt-1">
                     <Icon className="w-5 h-5 text-mint-400" />
                   </div>
@@ -262,7 +259,6 @@ export default function HomePage() {
             ))}
           </div>
 
-          {/* CTA */}
           <AnimatedSection delay={360} className="pt-14">
             <Link
               href="/auth/signup"
@@ -278,7 +274,7 @@ export default function HomePage() {
       {/* 벤토 기능 그리드 */}
       <section className="relative max-w-6xl mx-auto px-6 pb-28">
         <AnimatedSection className="text-center mb-14">
-          <h2 className="text-4xl font-bold text-sage-900 tracking-tight mb-3">복약 관리의 모든 것</h2>
+          <h2 className="text-4xl font-bold text-sage-900 dark:text-sage-50 tracking-tight mb-3">복약 관리의 모든 것</h2>
           <p className="text-sage-400 text-lg">필요한 모든 기능을 하나의 서비스에서</p>
         </AnimatedSection>
 
@@ -304,16 +300,16 @@ export default function HomePage() {
           {/* 복약 일정 */}
           <Link
             href="/auth/signup"
-            className="group bg-white rounded-3xl p-8 border border-sage-100 hover:shadow-xl hover:shadow-sage-200/50 hover:border-mint-200 transition-all duration-300 hover:-translate-y-1 active:translate-y-0"
+            className="group bg-white dark:bg-sage-800 rounded-3xl p-8 border border-sage-100 dark:border-sage-700 hover:shadow-xl hover:shadow-sage-200/50 dark:hover:shadow-sage-900/50 hover:border-mint-200 dark:hover:border-mint-700 transition-all duration-300 hover:-translate-y-1 active:translate-y-0"
           >
-            <div className="w-12 h-12 bg-mint-50 rounded-2xl flex items-center justify-center mb-6">
-              <CalendarDays className="w-6 h-6 text-mint-600" />
+            <div className="w-12 h-12 bg-mint-50 dark:bg-mint-900/20 rounded-2xl flex items-center justify-center mb-6">
+              <CalendarDays className="w-6 h-6 text-mint-600 dark:text-mint-400" />
             </div>
-            <h3 className="text-xl font-bold text-sage-900 mb-3">복약 일정 관리</h3>
+            <h3 className="text-xl font-bold text-sage-900 dark:text-sage-50 mb-3">복약 일정 관리</h3>
             <p className="text-sage-400 text-sm leading-relaxed mb-4">
               아침·점심·저녁·취침 시간대별로 복약 일정을 등록하고 매일 체크하세요.
             </p>
-            <span className="text-xs font-semibold text-mint-600 flex items-center gap-1 group-hover:gap-2 transition-all">
+            <span className="text-xs font-semibold text-mint-600 dark:text-mint-400 flex items-center gap-1 group-hover:gap-2 transition-all">
               시작하기 <ArrowRight className="w-3 h-3" />
             </span>
           </Link>
@@ -321,16 +317,16 @@ export default function HomePage() {
           {/* 약물 상호작용 */}
           <Link
             href="/auth/signup"
-            className="group bg-white rounded-3xl p-8 border border-sage-100 hover:shadow-xl hover:shadow-sage-200/50 hover:border-mint-200 transition-all duration-300 hover:-translate-y-1 active:translate-y-0"
+            className="group bg-white dark:bg-sage-800 rounded-3xl p-8 border border-sage-100 dark:border-sage-700 hover:shadow-xl hover:shadow-sage-200/50 dark:hover:shadow-sage-900/50 hover:border-mint-200 dark:hover:border-mint-700 transition-all duration-300 hover:-translate-y-1 active:translate-y-0"
           >
-            <div className="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center mb-6">
+            <div className="w-12 h-12 bg-red-50 dark:bg-red-900/20 rounded-2xl flex items-center justify-center mb-6">
               <ShieldAlert className="w-6 h-6 text-red-500" />
             </div>
-            <h3 className="text-xl font-bold text-sage-900 mb-3">약물 상호작용 감지</h3>
+            <h3 className="text-xl font-bold text-sage-900 dark:text-sage-50 mb-3">약물 상호작용 감지</h3>
             <p className="text-sage-400 text-sm leading-relaxed mb-4">
               복용 중인 약의 위험한 조합을 자동 감지하여 안전한 복약을 도와드립니다.
             </p>
-            <span className="text-xs font-semibold text-mint-600 flex items-center gap-1 group-hover:gap-2 transition-all">
+            <span className="text-xs font-semibold text-mint-600 dark:text-mint-400 flex items-center gap-1 group-hover:gap-2 transition-all">
               확인하기 <ArrowRight className="w-3 h-3" />
             </span>
           </Link>
@@ -352,13 +348,13 @@ export default function HomePage() {
       </section>
 
       {/* 푸터 */}
-      <footer className="border-t border-sage-100/80 py-8">
+      <footer className="border-t border-sage-100/80 dark:border-sage-700/80 py-8">
         <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-sage-400">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 bg-gradient-to-br from-mint-400 to-mint-600 rounded-lg flex items-center justify-center">
               <Pill className="w-3.5 h-3.5 text-white" />
             </div>
-            <span className="font-semibold text-sage-600">약속</span>
+            <span className="font-semibold text-sage-600 dark:text-sage-300">약속</span>
           </div>
           <p>© 2026 약속 · 본 서비스는 참고용이며 의료 진단을 대체하지 않습니다</p>
         </div>
