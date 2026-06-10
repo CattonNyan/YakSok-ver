@@ -1,18 +1,20 @@
 'use client'
+
 import { useState, useTransition, useMemo, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
-import { CheckCircle2, Circle, Sun, Sunset, Moon, Coffee } from 'lucide-react'
+import { Check, Sun, Sunset, Moon, Coffee, CalendarPlus, Search } from 'lucide-react'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
 import type { Schedule, MedicationLog, TimeSlot } from '@/types'
 import { cn } from '@/lib/utils'
+import Link from 'next/link'
 
-const TIME_SLOTS: { slot: TimeSlot; label: string; icon: React.ElementType; color: string }[] = [
-  { slot: 'morning',  label: '아침',   icon: Sun,     color: 'text-amber-500 bg-amber-50' },
-  { slot: 'lunch',    label: '점심',   icon: Coffee,  color: 'text-orange-500 bg-orange-50' },
-  { slot: 'dinner',   label: '저녁',   icon: Sunset,  color: 'text-purple-500 bg-purple-50' },
-  { slot: 'bedtime',  label: '취침 전', icon: Moon,    color: 'text-blue-500 bg-blue-50' },
+const TIME_SLOTS: { slot: TimeSlot; label: string; icon: React.ElementType; color: string; bg: string; darkBg: string }[] = [
+  { slot: 'morning', label: '아침',    icon: Sun,     color: 'text-amber-500',  bg: 'bg-amber-50',  darkBg: 'dark:bg-amber-900/20' },
+  { slot: 'lunch',   label: '점심',    icon: Coffee,  color: 'text-orange-500', bg: 'bg-orange-50', darkBg: 'dark:bg-orange-900/20' },
+  { slot: 'dinner',  label: '저녁',    icon: Sunset,  color: 'text-purple-500', bg: 'bg-purple-50', darkBg: 'dark:bg-purple-900/20' },
+  { slot: 'bedtime', label: '취침 전', icon: Moon,    color: 'text-blue-500',   bg: 'bg-blue-50',   darkBg: 'dark:bg-blue-900/20' },
 ]
 
 type MedicationInfo = { item_name: string; entp_name?: string }
@@ -36,17 +38,12 @@ export default function DashboardClient({ schedules, logs: initialLogs, userName
 
   const logMap = useMemo(() => {
     const map = new Map<string, MedicationLog>()
-    for (const l of logs) {
-      map.set(`${l.schedule_id}_${l.time_slot}`, l)
-    }
+    for (const l of logs) map.set(`${l.schedule_id}_${l.time_slot}`, l)
     return map
   }, [logs])
 
   const isLogTaken = useCallback(
-    (scheduleId: string, slot: TimeSlot) => {
-      const log = logMap.get(`${scheduleId}_${slot}`)
-      return log?.taken ?? false
-    },
+    (scheduleId: string, slot: TimeSlot) => logMap.get(`${scheduleId}_${slot}`)?.taken ?? false,
     [logMap]
   )
 
@@ -69,14 +66,8 @@ export default function DashboardClient({ schedules, logs: initialLogs, userName
       } else {
         const tempId = `temp_${scheduleId}_${slot}`
         const optimisticLog: MedicationLog = {
-          id: tempId,
-          user_id: userId,
-          schedule_id: scheduleId,
-          medication_id: medicationId,
-          log_date: today,
-          time_slot: slot,
-          taken: true,
-          taken_at: new Date().toISOString(),
+          id: tempId, user_id: userId, schedule_id: scheduleId, medication_id: medicationId,
+          log_date: today, time_slot: slot, taken: true, taken_at: new Date().toISOString(),
         }
         setLogs(prev => [...prev, optimisticLog])
         const { data, error } = await supabase
@@ -99,90 +90,159 @@ export default function DashboardClient({ schedules, logs: initialLogs, userName
   const totalDoses = schedules.reduce((sum, s) => sum + s.time_slots.length, 0)
   const takenDoses = logs.filter(l => l.taken).length
   const rate = totalDoses > 0 ? Math.round((takenDoses / totalDoses) * 100) : 0
-
   const dateLabel = format(new Date(), 'M월 d일 EEEE', { locale: ko })
 
   return (
-    <div className="max-w-2xl mx-auto space-y-5">
-      <div>
-        <p className="text-sm text-sage-500">{dateLabel}</p>
-        <h1 className="text-2xl font-bold text-sage-900">
-          {userName ? `${userName}님, ` : ''}안녕하세요 👋
-        </h1>
-      </div>
+    <div className="max-w-3xl mx-auto space-y-5">
 
-      <div className="card bg-gradient-to-r from-mint-500 to-mint-400 text-white border-0">
-        <div className="flex items-center justify-between mb-3">
-          <div>
-            <p className="text-mint-100 text-sm">오늘의 복약 완료율</p>
-            <p className="text-4xl font-bold">{rate}%</p>
-            <p className="text-mint-100 text-sm mt-1">{takenDoses} / {totalDoses} 회 완료</p>
-          </div>
-          <div className="w-20 h-20 relative" role="img" aria-label={`복약 완료율 ${rate}%`}>
-            <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36" aria-hidden="true">
-              <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="3" />
-              <circle cx="18" cy="18" r="15.9" fill="none" stroke="white" strokeWidth="3"
-                strokeDasharray={`${rate} ${100 - rate}`} strokeLinecap="round" />
-            </svg>
-            <span className="absolute inset-0 flex items-center justify-center text-sm font-bold" aria-hidden="true">{rate}%</span>
-          </div>
+      {/* ── 헤더 ── */}
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-sm font-medium text-sage-400 mb-1">{dateLabel}</p>
+          <h1 className="text-3xl font-bold text-sage-900 dark:text-sage-50 tracking-tight">
+            {userName ? `${userName}님,` : ''} 안녕하세요 👋
+          </h1>
         </div>
-        {rate === 100 && (
-          <div className="bg-white/20 rounded-xl px-3 py-2 text-sm">
-            🎉 오늘 모든 약을 복용했습니다!
+        {totalDoses > 0 && (
+          <div className="flex items-center gap-2 bg-white dark:bg-sage-800 rounded-2xl px-4 py-2.5 border border-sage-100 dark:border-sage-700 shadow-sm flex-shrink-0">
+            <span className={cn('w-2 h-2 rounded-full', rate === 100 ? 'bg-mint-500' : 'bg-amber-400')} />
+            <span className="text-sm font-semibold text-sage-700 dark:text-sage-200">{takenDoses}/{totalDoses} 완료</span>
           </div>
         )}
       </div>
 
+      {/* ── 진행률 카드 ── */}
+      {totalDoses > 0 && (
+        <div className="bg-gradient-to-br from-mint-500 via-mint-600 to-mint-700 rounded-3xl p-7 text-white shadow-xl shadow-mint-500/20">
+          <p className="text-mint-100 text-sm font-medium mb-3">오늘의 복약 완료율</p>
+          <div className="flex items-end justify-between mb-5">
+            <span className="text-6xl font-bold tracking-tight leading-none">{rate}%</span>
+            <span className="text-mint-200 text-sm mb-1">{takenDoses}회 / {totalDoses}회</span>
+          </div>
+          <div className="h-2 bg-white/20 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-white rounded-full transition-all duration-1000 ease-out"
+              style={{ width: `${rate}%` }}
+            />
+          </div>
+          {rate === 100 && (
+            <div className="mt-4 bg-white/15 backdrop-blur-sm rounded-2xl px-4 py-2.5 text-sm font-semibold">
+              🎉 오늘 모든 약을 복용했습니다!
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── 빈 상태 ── */}
       {schedules.length === 0 ? (
-        <div className="card text-center py-12">
-          <p className="text-4xl mb-3" role="img" aria-label="약">💊</p>
-          <p className="text-sage-500 font-medium mb-1">오늘 복용할 약이 없습니다</p>
-          <p className="text-sage-400 text-sm">복약 일정 메뉴에서 약을 추가해 주세요</p>
+        <div className="bg-white dark:bg-sage-800 rounded-3xl border border-sage-100 dark:border-sage-700 p-12 text-center shadow-sm">
+          <div className="w-16 h-16 bg-mint-50 dark:bg-mint-900/20 rounded-3xl flex items-center justify-center mx-auto mb-4">
+            <span className="text-3xl" role="img" aria-label="약">💊</span>
+          </div>
+          <p className="font-semibold text-sage-700 dark:text-sage-200 mb-1">오늘 복용할 약이 없습니다</p>
+          <p className="text-sage-400 text-sm mb-6">복약 일정을 등록하고 관리를 시작해보세요</p>
+          <div className="flex items-center justify-center gap-3">
+            <Link
+              href="/schedule/new"
+              className="inline-flex items-center gap-2 bg-mint-500 hover:bg-mint-600 text-white font-semibold px-5 py-2.5 rounded-2xl text-sm transition-colors shadow-md shadow-mint-500/20"
+            >
+              <CalendarPlus className="w-4 h-4" />
+              일정 추가
+            </Link>
+            <Link
+              href="/search"
+              className="inline-flex items-center gap-2 bg-white dark:bg-sage-700 hover:bg-sage-50 dark:hover:bg-sage-600 text-sage-700 dark:text-sage-200 font-semibold px-5 py-2.5 rounded-2xl text-sm border border-sage-200 dark:border-sage-600 transition-colors"
+            >
+              <Search className="w-4 h-4" />
+              약 검색
+            </Link>
+          </div>
         </div>
       ) : (
-        TIME_SLOTS.map(({ slot, label, icon: Icon, color }) => {
+        /* ── 시간대별 복약 카드 ── */
+        TIME_SLOTS.map(({ slot, label, icon: Icon, color, bg, darkBg }) => {
           const slotSchedules = schedules.filter(s => s.time_slots.includes(slot))
           if (slotSchedules.length === 0) return null
-          const allTaken = slotSchedules.every(s => isLogTaken(s.id, slot))
+
+          const takenCount = slotSchedules.filter(s => isLogTaken(s.id, slot)).length
+          const allTaken = takenCount === slotSchedules.length
 
           return (
-            <div key={slot} className="card">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center', color)}>
-                    <Icon className="w-4 h-4" />
+            <div
+              key={slot}
+              className="bg-white dark:bg-sage-800 rounded-3xl border border-sage-100 dark:border-sage-700 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200"
+            >
+              {/* 슬롯 헤더 */}
+              <div className="flex items-center justify-between px-6 py-4 border-b border-sage-50 dark:border-sage-700">
+                <div className="flex items-center gap-3">
+                  <div className={cn('w-9 h-9 rounded-2xl flex items-center justify-center', bg, darkBg)}>
+                    <Icon className={cn('w-4.5 h-4.5', color)} aria-hidden />
                   </div>
-                  <span className="font-semibold text-sage-800">{label}</span>
-                  <span className="text-sm text-sage-400">{slotSchedules.length}개</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-sage-900 dark:text-sage-50">{label}</span>
+                    <span className="text-xs text-sage-400 bg-sage-50 dark:bg-sage-700 dark:text-sage-300 px-2 py-0.5 rounded-full">{slotSchedules.length}종</span>
+                  </div>
                 </div>
-                {allTaken && <span className="badge-taken">✓ 완료</span>}
+
+                {allTaken ? (
+                  <span className="text-xs font-semibold text-mint-600 bg-mint-50 dark:bg-mint-900/20 dark:text-mint-400 border border-mint-100 dark:border-mint-800 px-3 py-1 rounded-full">
+                    ✓ 모두 완료
+                  </span>
+                ) : (
+                  <span className="text-xs text-sage-400 font-medium">
+                    {takenCount}/{slotSchedules.length} 완료
+                  </span>
+                )}
               </div>
 
-              <div className="space-y-3">
+              {/* 약 목록 */}
+              <div className="p-4 space-y-2.5">
                 {slotSchedules.map(s => {
                   const taken = isLogTaken(s.id, slot)
                   return (
-                    <button key={s.id}
+                    <button
+                      key={s.id}
                       onClick={() => toggleLog(s.id, s.medication_id, slot)}
                       disabled={isPending}
                       aria-label={`${getMedication(s)?.item_name} ${taken ? '복약 완료 — 취소하려면 탭하세요' : '복약하기'}`}
                       aria-pressed={taken}
                       className={cn(
-                        'w-full flex items-center gap-3 p-3 rounded-xl border transition-all text-left',
+                        'w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl border-2 transition-all duration-200 text-left group',
                         taken
-                          ? 'border-mint-200 bg-mint-50'
-                          : 'border-sage-100 bg-white hover:border-sage-200 hover:bg-sage-50'
+                          ? 'border-mint-200 dark:border-mint-700 bg-mint-50/60 dark:bg-mint-900/20'
+                          : 'border-transparent bg-sage-50 dark:bg-sage-700/50 hover:bg-sage-100 dark:hover:bg-sage-700 hover:border-sage-200 dark:hover:border-sage-600'
+                      )}
+                    >
+                      {/* 체크 원 */}
+                      <div className={cn(
+                        'w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all duration-200',
+                        taken
+                          ? 'border-mint-500 bg-mint-500'
+                          : 'border-sage-300 dark:border-sage-500 bg-white dark:bg-sage-700 group-hover:border-mint-400'
                       )}>
-                      {taken
-                        ? <CheckCircle2 className="w-6 h-6 text-mint-500 shrink-0" aria-hidden="true" />
-                        : <Circle className="w-6 h-6 text-sage-300 shrink-0" aria-hidden="true" />}
+                        {taken && <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} aria-hidden />}
+                      </div>
+
+                      {/* 약 정보 */}
                       <div className="flex-1 min-w-0">
-                        <p className={cn('font-medium text-sm truncate', taken ? 'text-mint-700 line-through' : 'text-sage-800')}>
+                        <p className={cn(
+                          'font-semibold text-sm truncate transition-all',
+                          taken ? 'text-mint-600 dark:text-mint-400 line-through decoration-mint-300' : 'text-sage-800 dark:text-sage-100'
+                        )}>
                           {getMedication(s)?.item_name}
                         </p>
-                        {s.dosage && <p className="text-xs text-sage-400 mt-0.5">{s.dosage}</p>}
+                        {s.dosage && (
+                          <p className="text-xs text-sage-400 mt-0.5">{s.dosage}</p>
+                        )}
                       </div>
+
+                      {/* 상태 레이블 */}
+                      <span className={cn(
+                        'text-xs font-semibold flex-shrink-0 transition-colors',
+                        taken ? 'text-mint-500 dark:text-mint-400' : 'text-sage-300 dark:text-sage-500 group-hover:text-sage-400'
+                      )}>
+                        {taken ? '완료' : '미복용'}
+                      </span>
                     </button>
                   )
                 })}
@@ -190,6 +250,30 @@ export default function DashboardClient({ schedules, logs: initialLogs, userName
             </div>
           )
         })
+      )}
+
+      {/* ── 빠른 액션 ── */}
+      {schedules.length > 0 && (
+        <div className="grid grid-cols-2 gap-3 pt-2">
+          <Link
+            href="/schedule/new"
+            className="flex items-center gap-3 bg-white dark:bg-sage-800 hover:bg-sage-50 dark:hover:bg-sage-700 border border-sage-100 dark:border-sage-700 rounded-2xl px-4 py-3.5 transition-colors group shadow-sm"
+          >
+            <div className="w-8 h-8 bg-mint-50 dark:bg-mint-900/20 rounded-xl flex items-center justify-center group-hover:bg-mint-100 dark:group-hover:bg-mint-900/30 transition-colors">
+              <CalendarPlus className="w-4 h-4 text-mint-600 dark:text-mint-400" aria-hidden />
+            </div>
+            <span className="text-sm font-semibold text-sage-700 dark:text-sage-200">일정 추가</span>
+          </Link>
+          <Link
+            href="/search"
+            className="flex items-center gap-3 bg-white dark:bg-sage-800 hover:bg-sage-50 dark:hover:bg-sage-700 border border-sage-100 dark:border-sage-700 rounded-2xl px-4 py-3.5 transition-colors group shadow-sm"
+          >
+            <div className="w-8 h-8 bg-sage-50 dark:bg-sage-700 rounded-xl flex items-center justify-center group-hover:bg-sage-100 dark:group-hover:bg-sage-600 transition-colors">
+              <Search className="w-4 h-4 text-sage-500 dark:text-sage-400" aria-hidden />
+            </div>
+            <span className="text-sm font-semibold text-sage-700 dark:text-sage-200">약 검색</span>
+          </Link>
+        </div>
       )}
     </div>
   )

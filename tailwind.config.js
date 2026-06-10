@@ -5,6 +5,7 @@ module.exports = {
     './components/**/*.{js,ts,jsx,tsx,mdx}',
     './app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
@@ -31,6 +32,7 @@ module.exports = {
           700: '#37463a',
           800: '#2e3930',
           900: '#272f28',
+          950: '#0f1a13',
         },
       },
       fontFamily: {
