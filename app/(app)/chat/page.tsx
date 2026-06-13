@@ -1,7 +1,7 @@
 'use client'
 export const dynamic = 'force-dynamic'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, type ReactNode } from 'react'
 import { Send, Loader2, Bot, User, AlertCircle, Sparkles } from 'lucide-react'
 import toast from 'react-hot-toast'
 import clsx from 'clsx'
@@ -14,6 +14,15 @@ interface Message {
 
 function createMessage(role: Message['role'], content: string): Message {
   return { id: crypto.randomUUID(), role, content }
+}
+
+function renderMessageContent(content: string): ReactNode[] {
+  return content.split(/(\*\*[^*]+\*\*)/g).map((part, index) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={index} className="font-bold">{part.slice(2, -2)}</strong>
+    }
+    return part
+  })
 }
 
 const QUICK = [
@@ -39,7 +48,8 @@ export default function ChatPage() {
     if (!text || loading) return
     setInput('')
     const userMessage = createMessage('user', text)
-    setMessages(prev => [...prev, userMessage])
+    const assistantMessage = createMessage('assistant', '')
+    setMessages(prev => [...prev, userMessage, assistantMessage])
     setLoading(true)
 
     try {
@@ -49,11 +59,57 @@ export default function ChatPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: apiMessages }),
       })
-      const data = await res.json()
-      setMessages(prev => [...prev, createMessage('assistant', data.reply ?? '답변을 생성하지 못했습니다.')])
-    } catch {
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => null)
+        throw new Error(data?.reply ?? '답변을 생성하지 못했습니다.')
+      }
+
+      if (!res.body) {
+        throw new Error('답변을 생성하지 못했습니다.')
+      }
+
+      const reader = res.body.getReader()
+      const decoder = new TextDecoder()
+      let reply = ''
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+
+        const chunk = decoder.decode(value, { stream: true })
+        reply += chunk
+        setMessages(prev => prev.map(message =>
+          message.id === assistantMessage.id
+            ? { ...message, content: reply }
+            : message
+        ))
+      }
+
+      const tail = decoder.decode()
+      if (tail) {
+        reply += tail
+        setMessages(prev => prev.map(message =>
+          message.id === assistantMessage.id
+            ? { ...message, content: reply }
+            : message
+        ))
+      }
+
+      if (!reply.trim()) {
+        setMessages(prev => prev.map(message =>
+          message.id === assistantMessage.id
+            ? { ...message, content: '답변을 생성하지 못했습니다.' }
+            : message
+        ))
+      }
+    } catch (error) {
       toast.error('네트워크 오류가 발생했습니다.')
-      setMessages(prev => [...prev, createMessage('assistant', '오류가 발생했습니다. 잠시 후 다시 시도해 주세요.')])
+      setMessages(prev => prev.map(message =>
+        message.id === assistantMessage.id
+          ? { ...message, content: error instanceof Error ? error.message : '오류가 발생했습니다. 잠시 후 다시 시도해 주세요.' }
+          : message
+      ))
     }
     setLoading(false)
   }
@@ -100,13 +156,23 @@ export default function ChatPage() {
                 ? 'bg-white dark:bg-sage-800 border border-sage-100 dark:border-sage-700 shadow-sm text-sage-800 dark:text-sage-100 rounded-3xl rounded-bl-lg'
                 : 'bg-mint-500 text-white rounded-3xl rounded-br-lg'
             )}>
-              {m.content}
+              {m.content ? renderMessageContent(m.content) : (
+                <span className="inline-flex gap-1 align-middle py-1">
+                  {[0, 1, 2].map(i => (
+                    <span
+                      key={i}
+                      className="w-1.5 h-1.5 rounded-full bg-mint-400 animate-bounce"
+                      style={{ animationDelay: `${i * 0.15}s` }}
+                    />
+                  ))}
+                </span>
+              )}
             </div>
           </div>
         ))}
 
         {/* 로딩 */}
-        {loading && (
+        {false && loading && (
           <div className="flex gap-3 items-end">
             <div className="w-8 h-8 rounded-2xl bg-gradient-to-br from-mint-400 to-mint-600 flex items-center justify-center shrink-0">
               <Bot className="w-4 h-4 text-white" />

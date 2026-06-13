@@ -1,15 +1,21 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
-const SYSTEM_PROMPT = `당신은 '약속' 서비스의 복약 상담 도우미입니다.
+type ChatMessage = {
+  role: 'user' | 'assistant'
+  content: string
+}
 
-반드시 지켜야 할 규칙:
-1. 반드시 한국어로만 답변합니다.
-2. 의약품 정보, 복약 방법, 부작용, 주의사항에 대해서만 답변합니다.
-3. 의료 진단, 처방, 질병 치료에 대한 조언은 제공하지 않습니다.
-4. 모든 답변 끝에 "정확한 복약 지도는 의사 또는 약사와 상담하세요"를 명시합니다.
-5. 답변은 명확하고 이해하기 쉽게 작성합니다.
-6. 위험할 수 있는 정보(약물 과다복용 등)는 절대 제공하지 않습니다.`
+function isChatMessage(message: unknown): message is ChatMessage {
+  if (!message || typeof message !== 'object') return false
+
+  const candidate = message as Record<string, unknown>
+  return (
+    (candidate.role === 'user' || candidate.role === 'assistant') &&
+    typeof candidate.content === 'string' &&
+    candidate.content.trim().length > 0
+  )
+}
 
 export async function POST(request: Request) {
   try {
@@ -20,49 +26,70 @@ export async function POST(request: Request) {
     }
 
     const { messages } = await request.json()
-    if (!messages?.length) return NextResponse.json({ reply: '' }, { status: 400 })
-
-    const apiKey = process.env.GROQ_API_KEY
-    if (!apiKey) {
-      return NextResponse.json({ reply: 'GROQ_API_KEY가 설정되지 않았습니다.' }, { status: 500 })
+    if (!Array.isArray(messages) || messages.length === 0) {
+      return NextResponse.json({ reply: '' }, { status: 400 })
     }
 
-    const chatMessages = messages
-      .filter((m: any) => m.role === 'user' || m.role === 'assistant')
-      .slice(-20)
-      .map((m: any) => ({ role: m.role, content: m.content }))
+    const chatMessages = messages.filter(isChatMessage).slice(-20)
+    const lastUserMessage = [...chatMessages].reverse().find(message => message.role === 'user')
 
-    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    if (!lastUserMessage) {
+      return NextResponse.json({ reply: '' }, { status: 400 })
+    }
+
+    const apiUrl = process.env.PILLDATA_CHAT_API_URL
+    if (!apiUrl) {
+      return NextResponse.json(
+        { reply: 'PILLDATA_CHAT_API_URL이 설정되지 않았습니다.' },
+        { status: 500 }
+      )
+    }
+
+    const apiKey = process.env.PILLDATA_CHAT_API_KEY
+    const history = chatMessages
+      .filter(message => message !== lastUserMessage)
+      .slice(-10)
+
+    const res = await fetch(new URL('/chat/stream', apiUrl).toString(), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
+        ...(apiKey ? { 'X-API-Key': apiKey } : {}),
       },
       body: JSON.stringify({
-        model: 'meta-llama/llama-4-scout-17b-16e-instruct',
-        messages: [
-          { role: 'system', content: SYSTEM_PROMPT },
-          ...chatMessages,
-        ],
-        max_tokens: 1024,
+        message: lastUserMessage.content,
+        history,
       }),
     })
 
     if (!res.ok) {
       const errText = await res.text()
-      console.error('Groq API 오류:', res.status, errText)
+      console.error('Pilldata Chat API error:', res.status, errText)
       return NextResponse.json(
         { reply: '답변 생성에 실패했습니다. 잠시 후 다시 시도해 주세요.' },
         { status: 502 }
       )
     }
 
-    const data = await res.json()
-    const reply = data?.choices?.[0]?.message?.content ?? '답변을 생성하지 못했습니다.'
-    return NextResponse.json({ reply })
+    if (!res.body) {
+      return NextResponse.json(
+        { reply: '답변을 생성하지 못했습니다.' },
+        { status: 502 }
+      )
+    }
+
+    return new Response(res.body, {
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Cache-Control': 'no-cache, no-transform',
+      },
+    })
 
   } catch (error) {
     console.error('Chat API error:', error)
-    return NextResponse.json({ reply: '오류가 발생했습니다. 잠시 후 다시 시도해 주세요.' }, { status: 500 })
+    return NextResponse.json(
+      { reply: '오류가 발생했습니다. 잠시 후 다시 시도해 주세요.' },
+      { status: 500 }
+    )
   }
 }
