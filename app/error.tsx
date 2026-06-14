@@ -22,13 +22,13 @@ export default function Error({ error, reset }: { error: Error; reset: () => voi
   const friendlyMessage = getFriendlyMessage(error)
 
   return (
-    <div className="min-h-screen bg-sage-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-sage-50 dark:bg-sage-950 flex items-center justify-center p-4">
       <div className="text-center max-w-sm w-full">
-        <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+        <div className="w-16 h-16 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
           <span className="text-3xl" role="img" aria-label="오류">!</span>
         </div>
-        <h2 className="text-xl font-bold text-sage-900 mb-2">오류가 발생했습니다</h2>
-        <p className="text-sage-500 mb-6 text-sm leading-relaxed">{friendlyMessage}</p>
+        <h2 className="text-xl font-bold text-sage-900 dark:text-sage-50 mb-2">오류가 발생했습니다</h2>
+        <p className="text-sage-500 dark:text-sage-400 mb-6 text-sm leading-relaxed">{friendlyMessage}</p>
         <button
           onClick={reset}
           className="btn-primary inline-flex items-center gap-2">

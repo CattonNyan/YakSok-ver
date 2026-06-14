@@ -344,10 +344,10 @@ export default function PharmacyMapClient() {
       <div className="flex flex-col items-center justify-center h-96 text-center gap-3">
         <AlertCircle className="w-12 h-12 text-amber-400" />
         <div>
-          <p className="font-semibold text-sage-900">네이버 지도 API 키가 설정되지 않았습니다</p>
-          <p className="text-sm text-sage-500 mt-1">
-            <code className="bg-sage-100 px-1 rounded text-xs">NEXT_PUBLIC_NAVER_MAP_CLIENT_ID</code>를{' '}
-            <code className="bg-sage-100 px-1 rounded text-xs">.env.local</code>에 추가해주세요.
+          <p className="font-semibold text-sage-900 dark:text-sage-50">네이버 지도 API 키가 설정되지 않았습니다</p>
+          <p className="text-sm text-sage-500 dark:text-sage-400 mt-1">
+            <code className="bg-sage-100 dark:bg-sage-700 px-1 rounded text-xs">NEXT_PUBLIC_NAVER_MAP_CLIENT_ID</code>를{' '}
+            <code className="bg-sage-100 dark:bg-sage-700 px-1 rounded text-xs">.env.local</code>에 추가해주세요.
           </p>
         </div>
       </div>
@@ -358,14 +358,14 @@ export default function PharmacyMapClient() {
     <div className="flex flex-col gap-4 h-full">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
-          <h1 className="text-xl font-bold text-sage-900">근처 약국 찾기</h1>
-          <p className="text-sm text-sage-500 mt-0.5">현재 위치 기준 가까운 약국을 지도에서 확인하세요</p>
+          <h1 className="text-xl font-bold text-sage-900 dark:text-sage-50">근처 약국 찾기</h1>
+          <p className="text-sm text-sage-500 dark:text-sage-400 mt-0.5">현재 위치 기준 가까운 약국을 지도에서 확인하세요</p>
         </div>
         <div className="flex gap-2">
           <button
             onClick={handleGoToMyLocation}
             disabled={!mapReady}
-            className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium bg-white border border-sage-200 text-sage-600 hover:bg-sage-50 disabled:opacity-40 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium bg-white dark:bg-sage-800 border border-sage-200 dark:border-sage-600 text-sage-600 dark:text-sage-300 hover:bg-sage-50 dark:hover:bg-sage-700 disabled:opacity-40 transition-colors"
           >
             <Navigation className="w-4 h-4" />
             <span className="hidden sm:inline">내 위치</span>
@@ -388,7 +388,7 @@ export default function PharmacyMapClient() {
           onChange={e => { setSearchQuery(e.target.value); setGeocodeError(null) }}
           placeholder="주소 또는 지역 검색 (예: 강남구 역삼동)"
           disabled={!mapReady}
-          className="flex-1 px-4 py-2.5 rounded-xl border border-sage-200 text-sm focus:outline-none focus:ring-2 focus:ring-mint-400 disabled:opacity-40"
+          className="flex-1 px-4 py-2.5 rounded-xl border border-sage-200 dark:border-sage-600 bg-white dark:bg-sage-800 text-sm text-sage-900 dark:text-sage-100 placeholder-sage-400 dark:placeholder-sage-500 focus:outline-none focus:ring-2 focus:ring-mint-400 disabled:opacity-40"
         />
         <button
           type="submit"
@@ -433,7 +433,7 @@ export default function PharmacyMapClient() {
             <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10">
               <button
                 onClick={handleSearchThisArea}
-                className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold bg-white border border-sage-200 text-sage-700 shadow-md hover:bg-sage-50 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold bg-white dark:bg-sage-800 border border-sage-200 dark:border-sage-600 text-sage-700 dark:text-sage-200 shadow-md hover:bg-sage-50 dark:hover:bg-sage-700 transition-colors"
               >
                 <Search className="w-4 h-4 text-mint-500" />
                 이 지역에서 검색
@@ -444,7 +444,7 @@ export default function PharmacyMapClient() {
         </div>
 
         <div className="lg:w-72 flex flex-col gap-2 min-h-0">
-          <p className="text-sm font-medium text-sage-600 shrink-0">
+          <p className="text-sm font-medium text-sage-600 dark:text-sage-300 shrink-0">
             {searching
               ? '약국 검색 중...'
               : pharmacies.length > 0
@@ -459,8 +459,8 @@ export default function PharmacyMapClient() {
                 onClick={() => handleListClick(idx)}
                 className={`text-left p-3 rounded-xl border transition-colors ${
                   selectedIdx === idx
-                    ? 'border-mint-400 bg-mint-50'
-                    : 'border-sage-100 bg-white hover:border-mint-200 hover:bg-mint-50/40'
+                    ? 'border-mint-400 dark:border-mint-600 bg-mint-50 dark:bg-mint-900/20'
+                    : 'border-sage-100 dark:border-sage-700 bg-white dark:bg-sage-800 hover:border-mint-200 dark:hover:border-mint-700 hover:bg-mint-50/40 dark:hover:bg-mint-900/10'
                 }`}
               >
                 <div className="flex items-start gap-2">
@@ -471,9 +471,9 @@ export default function PharmacyMapClient() {
                   />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5">
-                      <p className="text-sm font-semibold text-sage-900 truncate">{pharmacy.name}</p>
+                      <p className="text-sm font-semibold text-sage-900 dark:text-sage-100 truncate">{pharmacy.name}</p>
                       {pharmacy.distance !== null && (
-                        <span className="shrink-0 text-xs font-semibold text-mint-600 bg-mint-50 px-1.5 py-0.5 rounded-full">
+                        <span className="shrink-0 text-xs font-semibold text-mint-600 dark:text-mint-400 bg-mint-50 dark:bg-mint-900/30 px-1.5 py-0.5 rounded-full">
                           {formatDistance(pharmacy.distance)}
                         </span>
                       )}

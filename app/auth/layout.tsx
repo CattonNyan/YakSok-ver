@@ -69,7 +69,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       </div>
 
       {/* ── 우측 폼 영역 ── */}
-      <div className="flex-1 flex items-center justify-center p-6 relative">
+      <div className="flex-1 flex items-center justify-center p-6 relative overflow-hidden">
         {/* 배경 오브 */}
         <div className="absolute top-[-10%] right-[-5%] w-[400px] h-[400px] bg-mint-200/20 dark:bg-mint-900/10 rounded-full blur-[100px] pointer-events-none" />
         <div className="absolute bottom-[-5%] left-[-5%] w-[300px] h-[300px] bg-sage-200/15 dark:bg-sage-800/20 rounded-full blur-[80px] pointer-events-none" />

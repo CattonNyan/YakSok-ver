@@ -27,23 +27,23 @@ export default async function MedicinePage({ params }: { params: Promise<{ id: s
   return (
     <div className="max-w-2xl mx-auto space-y-5">
       <div className="flex items-center gap-3">
-        <Link href="/search" className="p-2 hover:bg-sage-100 rounded-xl transition-colors">
-          <ArrowLeft className="w-5 h-5 text-sage-600" />
+        <Link href="/search" className="p-2 hover:bg-sage-100 dark:hover:bg-sage-800 rounded-xl transition-colors">
+          <ArrowLeft className="w-5 h-5 text-sage-600 dark:text-sage-300" />
         </Link>
-        <h1 className="text-xl font-bold text-sage-900 truncate">{med.item_name}</h1>
+        <h1 className="text-xl font-bold text-sage-900 dark:text-sage-50 truncate">{med.item_name}</h1>
       </div>
 
       <div className="card flex items-start gap-4">
-        <div className="w-20 h-20 bg-sage-100 rounded-xl flex items-center justify-center shrink-0 overflow-hidden">
+        <div className="w-20 h-20 bg-sage-100 dark:bg-sage-700 rounded-xl flex items-center justify-center shrink-0 overflow-hidden">
           {med.image_url
             ? <img src={med.image_url} alt={med.item_name} className="w-full h-full object-cover" />
             : <span className="text-4xl">💊</span>}
         </div>
         <div className="flex-1 min-w-0">
-          <h2 className="text-lg font-bold text-sage-900">{med.item_name}</h2>
-          {med.entp_name && <p className="text-sm text-sage-500 mt-0.5">{med.entp_name}</p>}
+          <h2 className="text-lg font-bold text-sage-900 dark:text-sage-50">{med.item_name}</h2>
+          {med.entp_name && <p className="text-sm text-sage-500 dark:text-sage-400 mt-0.5">{med.entp_name}</p>}
           {med.class_name && (
-            <span className="inline-block mt-2 text-xs bg-sage-100 text-sage-600 px-2.5 py-1 rounded-full">
+            <span className="inline-block mt-2 text-xs bg-sage-100 dark:bg-sage-700 text-sage-600 dark:text-sage-300 px-2.5 py-1 rounded-full">
               {med.class_name}
             </span>
           )}
@@ -56,17 +56,17 @@ export default async function MedicinePage({ params }: { params: Promise<{ id: s
 
       {sections.map(({ label, content }) => (
         <div key={label} className="card">
-          <h3 className="font-semibold text-sage-800 mb-3 flex items-center gap-2">
+          <h3 className="font-semibold text-sage-800 dark:text-sage-100 mb-3 flex items-center gap-2">
             <span className="w-1 h-4 bg-mint-400 rounded-full inline-block" />
             {label}
           </h3>
-          <p className="text-sm text-sage-600 leading-relaxed whitespace-pre-line">{content}</p>
+          <p className="text-sm text-sage-600 dark:text-sage-300 leading-relaxed whitespace-pre-line">{content}</p>
         </div>
       ))}
 
-      <div className="flex items-start gap-2 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+      <div className="flex items-start gap-2 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 rounded-xl">
         <AlertCircle className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
-        <p className="text-xs text-amber-700 leading-relaxed">
+        <p className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed">
           본 정보는 식품의약품안전처 데이터를 기반으로 하며 참고용입니다.
           정확한 복약 지도는 의사 또는 약사와 상담하세요.
         </p>

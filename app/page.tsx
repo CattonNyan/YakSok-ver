@@ -105,12 +105,16 @@ export default function HomePage() {
             AI 기반 스마트 복약 관리
           </div>
 
-          <h1 className="text-6xl font-bold text-sage-900 dark:text-sage-50 leading-[1.08] tracking-tight mb-6">
-            약 관리,<br />
+          <h1 className="text-6xl font-bold text-sage-900 dark:text-white leading-[1.08] tracking-tight mb-6">
+            <span className="bg-gradient-to-r from-mint-500 to-mint-700 bg-clip-text text-transparent">
+              약 관리
+            </span>
+            ,<br />
             이제{' '}
             <span className="bg-gradient-to-r from-mint-500 to-mint-700 bg-clip-text text-transparent">
-              스마트하게
+              스마트
             </span>
+            하게
           </h1>
 
           <p className="text-xl text-sage-400 mb-10 leading-relaxed max-w-lg">
@@ -226,33 +230,33 @@ export default function HomePage() {
       </section>
 
       {/* ── 핵심 가치 매니페스토 ── */}
-      <section className="bg-sage-900 py-24 mb-20">
+      <section className="bg-sage-100 dark:bg-sage-900 py-24 mb-20">
         <div className="max-w-6xl mx-auto px-6">
           <AnimatedSection className="mb-14">
-            <p className="text-xs font-bold text-mint-400 tracking-[0.2em] uppercase mb-4">Our Core Values</p>
-            <h2 className="text-4xl font-bold text-white tracking-tight leading-tight max-w-lg">
+            <p className="text-xs font-bold text-mint-600 dark:text-mint-400 tracking-[0.2em] uppercase mb-4">Our Core Values</p>
+            <h2 className="text-4xl font-bold text-sage-900 dark:text-white tracking-tight leading-tight max-w-lg">
               약속이 제공하는<br />세 가지 핵심 가치
             </h2>
           </AnimatedSection>
 
-          <div className="divide-y divide-sage-700/60">
+          <div className="divide-y divide-sage-200 dark:divide-sage-700/60">
             {VALUES.map(({ num, icon: Icon, title, desc, tag }, i) => (
               <AnimatedSection key={num} delay={i * 120}>
                 <div className="py-10 flex flex-col md:flex-row md:items-start gap-6 md:gap-10">
-                  <span className="text-5xl font-black text-sage-700 leading-none w-16 flex-shrink-0 select-none">
+                  <span className="text-5xl font-black text-sage-300 dark:text-sage-700 leading-none w-16 flex-shrink-0 select-none">
                     {num}
                   </span>
                   <div className="flex-1">
                     <div className="flex flex-wrap items-center gap-3 mb-3">
-                      <h3 className="text-2xl md:text-3xl font-bold text-white">{title}</h3>
-                      <span className="text-xs font-semibold text-mint-400 border border-mint-700 px-2.5 py-0.5 rounded-full">
+                      <h3 className="text-2xl md:text-3xl font-bold text-sage-900 dark:text-white">{title}</h3>
+                      <span className="text-xs font-semibold text-mint-600 dark:text-mint-400 border border-mint-400 dark:border-mint-700 px-2.5 py-0.5 rounded-full">
                         {tag}
                       </span>
                     </div>
-                    <p className="text-sage-400 leading-relaxed max-w-2xl">{desc}</p>
+                    <p className="text-sage-500 dark:text-sage-400 leading-relaxed max-w-2xl">{desc}</p>
                   </div>
-                  <div className="hidden md:flex w-12 h-12 bg-sage-800 rounded-2xl items-center justify-center flex-shrink-0 mt-1">
-                    <Icon className="w-5 h-5 text-mint-400" />
+                  <div className="hidden md:flex w-12 h-12 bg-sage-200 dark:bg-sage-800 rounded-2xl items-center justify-center flex-shrink-0 mt-1">
+                    <Icon className="w-5 h-5 text-mint-600 dark:text-mint-400" />
                   </div>
                 </div>
               </AnimatedSection>

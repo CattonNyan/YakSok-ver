@@ -116,17 +116,17 @@ export default function DatePicker({ value, onChange, placeholder = '날짜 선�
       {/* 달력 팝오버 */}
       {open && (
         <div
-          className="absolute z-50 mt-1.5 w-72 bg-white rounded-2xl shadow-lg border border-sage-100 overflow-hidden"
+          className="absolute z-50 mt-1.5 w-72 bg-white dark:bg-sage-800 rounded-2xl shadow-lg border border-sage-100 dark:border-sage-700 overflow-hidden"
           onWheel={handleWheel}
         >
           {/* 연도 선택 패널 */}
           {showYearPicker ? (
             <div>
-              <div className="px-4 py-3 border-b border-sage-100 flex items-center justify-between">
-                <span className="font-semibold text-sage-800">연도 선택</span>
+              <div className="px-4 py-3 border-b border-sage-100 dark:border-sage-700 flex items-center justify-between">
+                <span className="font-semibold text-sage-800 dark:text-sage-100">연도 선택</span>
                 <button
                   onClick={() => setShowYearPicker(false)}
-                  className="text-xs text-mint-600 hover:text-mint-800 font-medium"
+                  className="text-xs text-mint-600 hover:text-mint-800 dark:text-mint-400 dark:hover:text-mint-300 font-medium"
                 >
                   닫기
                 </button>
@@ -140,8 +140,8 @@ export default function DatePicker({ value, onChange, placeholder = '날짜 선�
                     className={cn(
                       'w-full text-center py-2 text-sm transition-colors',
                       y === viewYear
-                        ? 'bg-mint-50 text-mint-700 font-semibold'
-                        : 'text-sage-700 hover:bg-sage-50'
+                        ? 'bg-mint-50 dark:bg-mint-900/20 text-mint-700 dark:text-mint-400 font-semibold'
+                        : 'text-sage-700 dark:text-sage-200 hover:bg-sage-50 dark:hover:bg-sage-700'
                     )}
                   >
                     {y}년
@@ -152,26 +152,26 @@ export default function DatePicker({ value, onChange, placeholder = '날짜 선�
           ) : (
             <>
               {/* 월 헤더 */}
-              <div className="flex items-center justify-between px-3 py-3 border-b border-sage-100">
+              <div className="flex items-center justify-between px-3 py-3 border-b border-sage-100 dark:border-sage-700">
                 <button
                   onClick={prevMonth}
-                  className="p-1.5 hover:bg-sage-50 rounded-lg transition-colors"
+                  className="p-1.5 hover:bg-sage-50 dark:hover:bg-sage-700 rounded-lg transition-colors"
                 >
-                  <ChevronLeft className="w-4 h-4 text-sage-500" />
+                  <ChevronLeft className="w-4 h-4 text-sage-500 dark:text-sage-400" />
                 </button>
 
                 <button
                   onClick={() => setShowYearPicker(true)}
-                  className="font-semibold text-sage-800 hover:text-mint-600 transition-colors text-sm px-2 py-1 rounded-lg hover:bg-sage-50"
+                  className="font-semibold text-sage-800 dark:text-sage-100 hover:text-mint-600 dark:hover:text-mint-400 transition-colors text-sm px-2 py-1 rounded-lg hover:bg-sage-50 dark:hover:bg-sage-700"
                 >
                   {viewYear}년 {MONTHS[viewMonth]}
                 </button>
 
                 <button
                   onClick={nextMonth}
-                  className="p-1.5 hover:bg-sage-50 rounded-lg transition-colors"
+                  className="p-1.5 hover:bg-sage-50 dark:hover:bg-sage-700 rounded-lg transition-colors"
                 >
-                  <ChevronRight className="w-4 h-4 text-sage-500" />
+                  <ChevronRight className="w-4 h-4 text-sage-500 dark:text-sage-400" />
                 </button>
               </div>
 
@@ -207,12 +207,12 @@ export default function DatePicker({ value, onChange, placeholder = '날짜 선�
                         isSelected
                           ? 'bg-mint-500 text-white shadow-sm'
                           : isToday
-                          ? 'ring-2 ring-mint-400 text-mint-700'
+                          ? 'ring-2 ring-mint-400 text-mint-700 dark:text-mint-400'
                           : dow === 0
-                          ? 'text-red-400 hover:bg-red-50'
+                          ? 'text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20'
                           : dow === 6
-                          ? 'text-blue-400 hover:bg-blue-50'
-                          : 'text-sage-700 hover:bg-sage-50'
+                          ? 'text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                          : 'text-sage-700 dark:text-sage-200 hover:bg-sage-50 dark:hover:bg-sage-700'
                       )}
                     >
                       {day}
@@ -222,14 +222,14 @@ export default function DatePicker({ value, onChange, placeholder = '날짜 선�
               </div>
 
               {/* 오늘 바로가기 */}
-              <div className="border-t border-sage-100 px-3 py-2">
+              <div className="border-t border-sage-100 dark:border-sage-700 px-3 py-2">
                 <button
                   onClick={() => {
                     setYear(today.getFullYear())
                     setMonth(today.getMonth())
                     selectDate(today.getDate())
                   }}
-                  className="w-full text-center text-xs text-mint-600 hover:text-mint-800 font-medium py-1 rounded-lg hover:bg-mint-50 transition-colors"
+                  className="w-full text-center text-xs text-mint-600 hover:text-mint-800 dark:text-mint-400 dark:hover:text-mint-300 font-medium py-1 rounded-lg hover:bg-mint-50 dark:hover:bg-mint-900/20 transition-colors"
                 >
                   오늘 선택
                 </button>

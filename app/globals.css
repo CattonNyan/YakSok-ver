@@ -38,6 +38,35 @@
   }
 }
 
+/* 스크롤 애니메이션 */
+.anim-fade-up {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.anim-fade-up.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 복약 체크 마이크로 인터랙션 */
+@keyframes check-pop {
+  0% { transform: scale(0); }
+  55% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+.animate-check-pop {
+  animation: check-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes celebrate-in {
+  0% { opacity: 0; transform: translateY(8px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.animate-celebrate-in {
+  animation: celebrate-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
 /* 스크롤바 */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }

@@ -48,8 +48,9 @@ export default function CalendarClient({ dateMap, currentMonth }: Props) {
   return (
     <div className="max-w-lg mx-auto space-y-5">
       <div>
-        <h1 className="text-2xl font-bold text-sage-900">복약 달력</h1>
-        <p className="text-sm text-sage-500 mt-1">월별 복약 이행률을 확인하세요</p>
+        <p className="text-xs font-bold text-mint-600 tracking-widest uppercase mb-1">Medication Calendar</p>
+        <h1 className="text-3xl font-bold text-sage-900 dark:text-sage-50 tracking-tight">복약 달력</h1>
+        <p className="text-sage-400 mt-1">월별 복약 이행률을 확인하세요</p>
       </div>
 
       <div className="grid grid-cols-3 gap-3">
@@ -58,7 +59,7 @@ export default function CalendarClient({ dateMap, currentMonth }: Props) {
           <p className="text-xs text-sage-500 mt-1">이행률</p>
         </div>
         <div className="card text-center">
-          <p className="text-2xl font-bold text-sage-700">{totalTaken}</p>
+          <p className="text-2xl font-bold text-sage-700 dark:text-sage-200">{totalTaken}</p>
           <p className="text-xs text-sage-500 mt-1">복약 완료</p>
         </div>
         <div className="card text-center">
@@ -70,13 +71,13 @@ export default function CalendarClient({ dateMap, currentMonth }: Props) {
       <div className="card">
         <div className="flex items-center justify-between mb-4">
           <button onClick={() => router.push(`/calendar?month=${prevMonth}`)}
-            className="p-2 hover:bg-sage-50 rounded-lg transition-colors">
-            <ChevronLeft className="w-5 h-5 text-sage-600" />
+            className="p-2 hover:bg-sage-50 dark:hover:bg-sage-700 rounded-lg transition-colors">
+            <ChevronLeft className="w-5 h-5 text-sage-600 dark:text-sage-300" />
           </button>
-          <h2 className="font-semibold text-sage-800">{monthLabel}</h2>
+          <h2 className="font-semibold text-sage-800 dark:text-sage-100">{monthLabel}</h2>
           <button onClick={() => router.push(`/calendar?month=${nextMonth}`)}
-            className="p-2 hover:bg-sage-50 rounded-lg transition-colors">
-            <ChevronRight className="w-5 h-5 text-sage-600" />
+            className="p-2 hover:bg-sage-50 dark:hover:bg-sage-700 rounded-lg transition-colors">
+            <ChevronRight className="w-5 h-5 text-sage-600 dark:text-sage-300" />
           </button>
         </div>
 
@@ -103,13 +104,13 @@ export default function CalendarClient({ dateMap, currentMonth }: Props) {
               <div key={day}
                 onClick={() => setSelectedDate(prev => prev === dateStr ? null : dateStr)}
                 className={cn(
-                  'aspect-square flex flex-col items-center justify-center rounded-xl text-sm transition-colors cursor-pointer hover:bg-sage-50',
+                  'aspect-square flex flex-col items-center justify-center rounded-xl text-sm transition-colors cursor-pointer hover:bg-sage-50 dark:hover:bg-sage-700/50',
                   isToday ? 'ring-2 ring-mint-400' : '',
-                  isSelected ? 'bg-mint-50 ring-2 ring-mint-400' : '',
+                  isSelected ? 'bg-mint-50 dark:bg-mint-900/20 ring-2 ring-mint-400' : '',
                 )}>
                 <span className={cn(
                   'text-xs font-medium',
-                  dayOfWeek === 0 ? 'text-red-400' : dayOfWeek === 6 ? 'text-blue-400' : 'text-sage-700'
+                  dayOfWeek === 0 ? 'text-red-400' : dayOfWeek === 6 ? 'text-blue-400' : 'text-sage-700 dark:text-sage-200'
                 )}>{day}</span>
                 {dotColor && (
                   <div className={cn('w-5 h-1.5 rounded-full mt-0.5', dotColor)} />
@@ -124,10 +125,10 @@ export default function CalendarClient({ dateMap, currentMonth }: Props) {
         const day = dateMap[selectedDate]
         const label = format(new Date(selectedDate), 'M월 d일 (eee)', { locale: ko })
         return (
-          <div className="card border border-mint-100">
+          <div className="card border border-mint-100 dark:border-mint-800">
             <div className="flex items-center justify-between mb-3">
-              <p className="font-semibold text-sage-800">{label} 복약 내역</p>
-              <button onClick={() => setSelectedDate(null)} className="p-1 hover:bg-sage-100 rounded-lg">
+              <p className="font-semibold text-sage-800 dark:text-sage-100">{label} 복약 내역</p>
+              <button onClick={() => setSelectedDate(null)} className="p-1 hover:bg-sage-100 dark:hover:bg-sage-700 rounded-lg">
                 <X className="w-4 h-4 text-sage-400" />
               </button>
             </div>
@@ -136,9 +137,9 @@ export default function CalendarClient({ dateMap, currentMonth }: Props) {
             ) : (
               <div className="space-y-2">
                 {day.logs.map((log, i) => (
-                  <div key={i} className="flex items-center justify-between py-2 border-b border-sage-50 last:border-0">
+                  <div key={i} className="flex items-center justify-between py-2 border-b border-sage-50 dark:border-sage-700 last:border-0">
                     <div>
-                      <p className="text-sm font-medium text-sage-800">{log.item_name}</p>
+                      <p className="text-sm font-medium text-sage-800 dark:text-sage-100">{log.item_name}</p>
                       <p className="text-xs text-sage-400">{SLOT_LABEL[log.time_slot] ?? log.time_slot}</p>
                     </div>
                     {log.taken

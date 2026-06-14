@@ -11,10 +11,12 @@ export default async function DashboardPage() {
   const now = new Date()
   const kstDate = new Date(now.getTime() + 9 * 60 * 60 * 1000)
   const today = kstDate.toISOString().split('T')[0]
+  const historyStart = new Date(kstDate.getTime() - 29 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
 
   const [
     { data: schedules },
     { data: logs },
+    { data: recentLogs },
     { data: profile },
   ] = await Promise.all([
     supabase
@@ -32,6 +34,13 @@ export default async function DashboardPage() {
       .eq('log_date', today),
 
     supabase
+      .from('medication_logs')
+      .select('log_date,taken')
+      .eq('user_id', user.id)
+      .gte('log_date', historyStart)
+      .lt('log_date', today),
+
+    supabase
       .from('profiles')
       .select('name')
       .eq('id', user.id)
@@ -45,6 +54,7 @@ export default async function DashboardPage() {
     <DashboardClient
       schedules={typedSchedules}
       logs={logs ?? []}
+      recentLogs={recentLogs ?? []}
       userName={profile?.name ?? ''}
       today={today}
       userId={user.id}
