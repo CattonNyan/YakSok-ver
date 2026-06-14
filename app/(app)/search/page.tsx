@@ -8,6 +8,16 @@ import MedicationCard from '@/components/medicine/MedicationCard'
 import type { Medication } from '@/types'
 import clsx from 'clsx'
 
+type ImageCandidate = {
+  code?: string
+  name?: string
+  confidence?: number
+  accepted?: boolean
+  ocrText?: string
+  ocrNormalized?: string
+  bbox?: number[]
+}
+
 const SHAPES = ['원형', '타원형', '장방형', '반원형', '삼각형', '사각형', '마름모형', '오각형', '육각형', '팔각형', '기타']
 const FORM_CODES = ['정제', '필름코팅정', '경질캡슐제', '연질캡슐제', '장용성필름코팅정', '서방성필름코팅정', '츄어블정', '구강붕해정', '발포정']
 const COLORS: { label: string; value: string; hex: string }[] = [
@@ -122,6 +132,8 @@ export default function SearchPage() {
     return response.blob()
   }
 
+  const normalizeApiUrl = (url: string) => url.replace(/\/health\/?$/, '').replace(/\/$/, '')
+
   const handleTextSearch = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!query.trim()) return
@@ -158,17 +170,50 @@ export default function SearchPage() {
   const handleImageSearch = async (image: string) => {
     if (!image) return
     setLoading(true); setResults([])
+    let timeoutId: number | undefined
     try {
       const controller = new AbortController()
-      const timeoutId = window.setTimeout(() => controller.abort(), 45_000)
-      const formData = new FormData()
-      formData.append('image', await dataUrlToBlob(image), 'pill-photo.jpg')
-      const res = await fetch('/api/medications/image-search', {
-        method: 'POST',
-        body: formData,
-        signal: controller.signal,
-      })
-      window.clearTimeout(timeoutId)
+      timeoutId = window.setTimeout(() => controller.abort(), 45_000)
+
+      const directApiUrl = process.env.NEXT_PUBLIC_PILL_IMAGE_API_URL
+      const directApiKey = process.env.NEXT_PUBLIC_PILL_IMAGE_API_KEY
+      let res: Response
+
+      if (directApiUrl) {
+        const predictRes = await fetch(`${normalizeApiUrl(directApiUrl)}/predict`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(directApiKey ? { 'X-API-Key': directApiKey } : {}),
+          },
+          body: JSON.stringify({ image }),
+          signal: controller.signal,
+        })
+        const predictText = await predictRes.text()
+        const predictData = predictText ? JSON.parse(predictText) : {}
+
+        if (!predictRes.ok) {
+          toast.error(predictData.detail ?? `이미지 분석 서버 요청이 실패했습니다. (HTTP ${predictRes.status})`)
+          return
+        }
+
+        const imageCandidates: ImageCandidate[] = Array.isArray(predictData?.candidates) ? predictData.candidates : []
+        res = await fetch('/api/medications/image-search', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ imageCandidates }),
+          signal: controller.signal,
+        })
+      } else {
+        const formData = new FormData()
+        formData.append('image', await dataUrlToBlob(image), 'pill-photo.jpg')
+        res = await fetch('/api/medications/image-search', {
+          method: 'POST',
+          body: formData,
+          signal: controller.signal,
+        })
+      }
+
       const text = await res.text()
       const data = text ? JSON.parse(text) : {}
       if (!res.ok) {
@@ -183,8 +228,10 @@ export default function SearchPage() {
       } else {
         toast.error('이미지 분석 요청을 처리하지 못했습니다. 배포 환경변수와 네트워크 상태를 확인해주세요.')
       }
+    } finally {
+      if (timeoutId) window.clearTimeout(timeoutId)
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   const hasShapeFilter = selectedShape || selectedColor1 || selectedColor2 || markText || selectedForm

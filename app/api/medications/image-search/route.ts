@@ -40,25 +40,31 @@ async function findMedication(supabase: Awaited<ReturnType<typeof createClient>>
   return null
 }
 
-async function readImageFromRequest(request: Request) {
+async function readImageSearchPayload(request: Request) {
   const contentType = request.headers.get('content-type') ?? ''
 
   if (contentType.includes('multipart/form-data')) {
     const formData = await request.formData()
     const imageValue = formData.get('image')
 
-    if (typeof imageValue === 'string') return imageValue
+    if (typeof imageValue === 'string') return { image: imageValue, imageCandidates: [] as ImageCandidate[] }
     if (imageValue && typeof imageValue === 'object' && 'arrayBuffer' in imageValue) {
       const imageFile = imageValue as File
       const buffer = Buffer.from(await imageFile.arrayBuffer())
-      return `data:${imageFile.type || 'image/jpeg'};base64,${buffer.toString('base64')}`
+      return {
+        image: `data:${imageFile.type || 'image/jpeg'};base64,${buffer.toString('base64')}`,
+        imageCandidates: [] as ImageCandidate[],
+      }
     }
 
-    return null
+    return { image: null, imageCandidates: [] as ImageCandidate[] }
   }
 
   const body = await request.json()
-  return typeof body?.image === 'string' ? body.image : null
+  return {
+    image: typeof body?.image === 'string' ? body.image : null,
+    imageCandidates: Array.isArray(body?.imageCandidates) ? body.imageCandidates as ImageCandidate[] : [],
+  }
 }
 
 export async function GET() {
@@ -109,63 +115,67 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const image = await readImageFromRequest(request)
-    if (!image) return NextResponse.json({ candidates: [] }, { status: 400 })
+    const { image, imageCandidates: providedCandidates } = await readImageSearchPayload(request)
+    if (!image && providedCandidates.length === 0) {
+      return NextResponse.json({ candidates: [] }, { status: 400 })
+    }
 
-    const [, base64Data] = image.split(',')
-    if (base64Data && Buffer.byteLength(base64Data, 'base64') > MAX_BASE64_BYTES) {
+    const [, base64Data] = image ? image.split(',') : []
+    if (image && base64Data && Buffer.byteLength(base64Data, 'base64') > MAX_BASE64_BYTES) {
       return NextResponse.json(
         { candidates: [], error: '이미지 크기는 5MB를 초과할 수 없습니다.' },
         { status: 413 }
       )
     }
 
-    const apiUrl = process.env.PILL_IMAGE_API_URL
-    if (!apiUrl) {
-      return NextResponse.json(
-        { candidates: [], error: 'PILL_IMAGE_API_URL이 설정되지 않았습니다.' },
-        { status: 500 }
-      )
+    let imageCandidates: ImageCandidate[] = providedCandidates
+
+    if (imageCandidates.length === 0 && image) {
+      const apiUrl = process.env.PILL_IMAGE_API_URL
+      if (!apiUrl) {
+        return NextResponse.json(
+          { candidates: [], error: 'PILL_IMAGE_API_URL이 설정되지 않았습니다.' },
+          { status: 500 }
+        )
+      }
+
+      const apiKey = process.env.PILL_IMAGE_API_KEY
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 30_000)
+
+      let modelRes: Response
+      try {
+        modelRes = await fetch(`${normalizeApiUrl(apiUrl)}/predict`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(apiKey ? { 'X-API-Key': apiKey } : {}),
+          },
+          body: JSON.stringify({ image }),
+          signal: controller.signal,
+        })
+      } catch (error) {
+        console.error('Pill image API request failed:', error)
+        return NextResponse.json(
+          { candidates: [], error: '이미지 분석 서버에 연결하지 못했습니다. EC2 보안 그룹에서 8010 포트가 외부에 열려 있는지 확인해주세요.' },
+          { status: 504 }
+        )
+      } finally {
+        clearTimeout(timeoutId)
+      }
+
+      if (!modelRes.ok) {
+        const err = await modelRes.text()
+        console.error('Pill image API error:', modelRes.status, err)
+        return NextResponse.json(
+          { candidates: [], error: '이미지 분석에 실패했습니다.' },
+          { status: 502 }
+        )
+      }
+
+      const modelData = await modelRes.json()
+      imageCandidates = Array.isArray(modelData?.candidates) ? modelData.candidates : []
     }
-
-    const apiKey = process.env.PILL_IMAGE_API_KEY
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 30_000)
-
-    let modelRes: Response
-    try {
-      modelRes = await fetch(`${normalizeApiUrl(apiUrl)}/predict`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(apiKey ? { 'X-API-Key': apiKey } : {}),
-        },
-        body: JSON.stringify({ image }),
-        signal: controller.signal,
-      })
-    } catch (error) {
-      console.error('Pill image API request failed:', error)
-      return NextResponse.json(
-        { candidates: [], error: '이미지 분석 서버에 연결하지 못했습니다. EC2 보안 그룹에서 8010 포트가 외부에 열려 있는지 확인해주세요.' },
-        { status: 504 }
-      )
-    } finally {
-      clearTimeout(timeoutId)
-    }
-
-    if (!modelRes.ok) {
-      const err = await modelRes.text()
-      console.error('Pill image API error:', modelRes.status, err)
-      return NextResponse.json(
-        { candidates: [], error: '이미지 분석에 실패했습니다.' },
-        { status: 502 }
-      )
-    }
-
-    const modelData = await modelRes.json()
-    const imageCandidates: ImageCandidate[] = Array.isArray(modelData?.candidates)
-      ? modelData.candidates
-      : []
 
     if (imageCandidates.length === 0) {
       return NextResponse.json({ candidates: [] })
