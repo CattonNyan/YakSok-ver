@@ -25,13 +25,38 @@ function predictionTerms(candidate: ImageCandidate) {
 }
 
 async function findMedication(supabase: Awaited<ReturnType<typeof createClient>>, term: string) {
-  const searchColumns = ['item_name', 'print_front', 'print_back', 'mark_code_front', 'mark_code_back']
+  const imprintColumns = ['print_front', 'print_back', 'mark_code_front', 'mark_code_back']
+  const searchColumns = ['item_name', ...imprintColumns]
+  const trimmedTerm = term.trim()
+  const isShortImprint = /^[A-Z0-9]{2,3}$/.test(trimmedTerm.toUpperCase())
+
+  for (const column of imprintColumns) {
+    const { data } = await supabase
+      .from('medications')
+      .select(MEDICATION_COLUMNS)
+      .ilike(column, trimmedTerm)
+      .limit(1)
+
+    if (data?.[0]) return data[0]
+  }
+
+  if (isShortImprint) return null
+
+  for (const pattern of [trimmedTerm, `${trimmedTerm}%`, `%${trimmedTerm}%`]) {
+    const { data } = await supabase
+      .from('medications')
+      .select(MEDICATION_COLUMNS)
+      .ilike('item_name', pattern)
+      .limit(1)
+
+    if (data?.[0]) return data[0]
+  }
 
   for (const column of searchColumns) {
     const { data } = await supabase
       .from('medications')
       .select(MEDICATION_COLUMNS)
-      .ilike(column, `%${term}%`)
+      .ilike(column, `%${trimmedTerm}%`)
       .limit(1)
 
     if (data?.[0]) return data[0]
