@@ -62,14 +62,29 @@ export async function POST(request: Request) {
     }
 
     const apiKey = process.env.PILL_IMAGE_API_KEY
-    const modelRes = await fetch(`${normalizeApiUrl(apiUrl)}/predict`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(apiKey ? { 'X-API-Key': apiKey } : {}),
-      },
-      body: JSON.stringify({ image }),
-    })
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 30_000)
+
+    let modelRes: Response
+    try {
+      modelRes = await fetch(`${normalizeApiUrl(apiUrl)}/predict`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(apiKey ? { 'X-API-Key': apiKey } : {}),
+        },
+        body: JSON.stringify({ image }),
+        signal: controller.signal,
+      })
+    } catch (error) {
+      console.error('Pill image API request failed:', error)
+      return NextResponse.json(
+        { candidates: [], error: '이미지 분석 서버에 연결하지 못했습니다. EC2 보안 그룹에서 8010 포트가 외부에 열려 있는지 확인해주세요.' },
+        { status: 504 }
+      )
+    } finally {
+      clearTimeout(timeoutId)
+    }
 
     if (!modelRes.ok) {
       const err = await modelRes.text()
