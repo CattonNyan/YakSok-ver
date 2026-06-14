@@ -132,6 +132,29 @@ export default function SearchPage() {
     return response.blob()
   }
 
+  const resizeImageFile = (file: File, maxSize = 640, quality = 0.55) => {
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader()
+
+      reader.onload = () => {
+        const image = new window.Image()
+        image.onload = () => {
+          const canvas = document.createElement('canvas')
+          const scale = Math.min(1, maxSize / Math.max(image.width, image.height))
+          canvas.width = Math.round(image.width * scale)
+          canvas.height = Math.round(image.height * scale)
+          canvas.getContext('2d')?.drawImage(image, 0, 0, canvas.width, canvas.height)
+          resolve(canvas.toDataURL('image/jpeg', quality))
+        }
+        image.onerror = reject
+        image.src = reader.result as string
+      }
+
+      reader.onerror = reject
+      reader.readAsDataURL(file)
+    })
+  }
+
   const normalizeApiUrl = (url: string) => url.replace(/\/health\/?$/, '').replace(/\/$/, '')
 
   const handleTextSearch = async (e: React.FormEvent) => {
@@ -428,13 +451,15 @@ export default function SearchPage() {
                   )}
                 </div>
                 <input ref={fileRef} type="file" accept="image/*" className="hidden"
-                  onChange={e => {
+                  onChange={async e => {
                     const file = e.target.files?.[0]
                     if (!file) return
-                    if (file.size > 5 * 1024 * 1024) { toast.error('5MB 이하 이미지만 업로드 가능합니다'); return }
-                    const reader = new FileReader()
-                    reader.onload = ev => setImagePreview(ev.target?.result as string)
-                    reader.readAsDataURL(file)
+                    if (file.size > 10 * 1024 * 1024) { toast.error('10MB 이하 이미지만 업로드 가능합니다'); return }
+                    try {
+                      setImagePreview(await resizeImageFile(file))
+                    } catch {
+                      toast.error('이미지를 불러오지 못했습니다. 다른 사진으로 다시 시도해주세요.')
+                    }
                   }}
                 />
                 <button
