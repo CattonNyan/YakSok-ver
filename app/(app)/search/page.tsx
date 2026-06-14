@@ -116,12 +116,12 @@ export default function SearchPage() {
   const capturePhoto = () => {
     const video = videoRef.current; const canvas = canvasRef.current
     if (!video || !canvas) return
-    const maxSize = 1600
+    const maxSize = 640
     const scale = Math.min(1, maxSize / Math.max(video.videoWidth, video.videoHeight))
     canvas.width = Math.round(video.videoWidth * scale)
     canvas.height = Math.round(video.videoHeight * scale)
     canvas.getContext('2d')?.drawImage(video, 0, 0, canvas.width, canvas.height)
-    setCapturedImage(canvas.toDataURL('image/jpeg', 0.85))
+    setCapturedImage(canvas.toDataURL('image/jpeg', 0.55))
     stopCamera()
   }
   useEffect(() => () => stopCamera(), [])
@@ -132,7 +132,7 @@ export default function SearchPage() {
     return response.blob()
   }
 
-  const resizeImageFile = (file: File, maxSize = 1600, quality = 0.85) => {
+  const resizeImageFile = (file: File, maxSize = 640, quality = 0.55) => {
     return new Promise<string>((resolve, reject) => {
       const reader = new FileReader()
 
