@@ -19,7 +19,7 @@ function normalizeApiUrl(url: string) {
 }
 
 function predictionTerms(candidate: ImageCandidate) {
-  return [candidate.name, candidate.ocrNormalized, candidate.ocrText]
+  return [candidate.ocrNormalized, candidate.ocrText, candidate.name]
     .filter((value): value is string => Boolean(value && value.trim().length >= 2))
     .map(value => value.trim())
 }
