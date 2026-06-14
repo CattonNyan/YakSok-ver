@@ -598,24 +598,18 @@ export default function SearchPage() {
       {!loading && results.length > 0 && (
         <div className="space-y-3">
           <p className="text-sm font-semibold text-sage-500 dark:text-sage-400 px-1">검색 결과 <span className="text-mint-600 dark:text-mint-400">{results.length}개</span></p>
-          {results.map(med => {
-            const prediction = med.image_prediction
-
-            return (
-              <div key={med.id} className="space-y-2">
-                {mode === 'image' && prediction && (
-                  <div className="rounded-2xl border border-blue-100 dark:border-blue-900/60 bg-blue-50/70 dark:bg-blue-950/20 px-4 py-3 text-xs text-sage-600 dark:text-sage-300">
-                    <p className="font-bold text-blue-700 dark:text-blue-300 mb-1">AI 인식 참고값</p>
-                    <div className="flex flex-wrap gap-x-4 gap-y-1">
-                      <span>OCR 원문: <b>{prediction.ocrText || '없음'}</b></span>
-                      <span>OCR 정규화: <b>{prediction.ocrNormalized || '없음'}</b></span>
-                    </div>
-                  </div>
-                )}
-                <MedicationCard medication={med} showAddButton />
+          {mode === 'image' && results[0]?.image_prediction && (
+            <div className="rounded-2xl border border-blue-100 dark:border-blue-900/60 bg-blue-50/70 dark:bg-blue-950/20 px-4 py-3 text-xs text-sage-600 dark:text-sage-300">
+              <p className="font-bold text-blue-700 dark:text-blue-300 mb-1">AI 인식 참고값</p>
+              <div className="flex flex-wrap gap-x-4 gap-y-1">
+                <span>OCR 원문: <b>{results[0].image_prediction.ocrText || '없음'}</b></span>
+                <span>OCR 정규화: <b>{results[0].image_prediction.ocrNormalized || '없음'}</b></span>
               </div>
-            )
-          })}
+            </div>
+          )}
+          {results.map(med => (
+            <MedicationCard key={med.id} medication={med} showAddButton />
+          ))}
         </div>
       )}
     </div>
