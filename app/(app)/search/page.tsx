@@ -18,6 +18,10 @@ type ImageCandidate = {
   bbox?: number[]
 }
 
+type ImageSearchMedication = Medication & {
+  image_prediction?: ImageCandidate
+}
+
 const SHAPES = ['원형', '타원형', '장방형', '반원형', '삼각형', '사각형', '마름모형', '오각형', '육각형', '팔각형', '기타']
 const FORM_CODES = ['정제', '필름코팅정', '경질캡슐제', '연질캡슐제', '장용성필름코팅정', '서방성필름코팅정', '츄어블정', '구강붕해정', '발포정']
 const COLORS: { label: string; value: string; hex: string }[] = [
@@ -74,7 +78,7 @@ const MODES: { key: Mode; label: string; icon: React.ElementType }[] = [
 
 export default function SearchPage() {
   const [query, setQuery]                 = useState('')
-  const [results, setResults]             = useState<Medication[]>([])
+  const [results, setResults]             = useState<ImageSearchMedication[]>([])
   const [loading, setLoading]             = useState(false)
   const [imagePreview, setImagePreview]   = useState<string | null>(null)
   const [capturedImage, setCapturedImage] = useState<string | null>(null)
@@ -116,12 +120,12 @@ export default function SearchPage() {
   const capturePhoto = () => {
     const video = videoRef.current; const canvas = canvasRef.current
     if (!video || !canvas) return
-    const maxSize = 640
+    const maxSize = 1280
     const scale = Math.min(1, maxSize / Math.max(video.videoWidth, video.videoHeight))
     canvas.width = Math.round(video.videoWidth * scale)
     canvas.height = Math.round(video.videoHeight * scale)
     canvas.getContext('2d')?.drawImage(video, 0, 0, canvas.width, canvas.height)
-    setCapturedImage(canvas.toDataURL('image/jpeg', 0.55))
+    setCapturedImage(canvas.toDataURL('image/jpeg', 0.75))
     stopCamera()
   }
   useEffect(() => () => stopCamera(), [])
@@ -132,7 +136,7 @@ export default function SearchPage() {
     return response.blob()
   }
 
-  const resizeImageFile = (file: File, maxSize = 640, quality = 0.55) => {
+  const resizeImageFile = (file: File, maxSize = 1280, quality = 0.75) => {
     return new Promise<string>((resolve, reject) => {
       const reader = new FileReader()
 
@@ -594,9 +598,28 @@ export default function SearchPage() {
       {!loading && results.length > 0 && (
         <div className="space-y-3">
           <p className="text-sm font-semibold text-sage-500 dark:text-sage-400 px-1">검색 결과 <span className="text-mint-600 dark:text-mint-400">{results.length}개</span></p>
-          {results.map(med => (
-            <MedicationCard key={med.id} medication={med} showAddButton />
-          ))}
+          {results.map(med => {
+            const prediction = med.image_prediction
+            const confidence = typeof prediction?.confidence === 'number'
+              ? `${Math.round(prediction.confidence * 100)}%`
+              : undefined
+
+            return (
+              <div key={med.id} className="space-y-2">
+                {mode === 'image' && prediction && (
+                  <div className="rounded-2xl border border-blue-100 dark:border-blue-900/60 bg-blue-50/70 dark:bg-blue-950/20 px-4 py-3 text-xs text-sage-600 dark:text-sage-300">
+                    <p className="font-bold text-blue-700 dark:text-blue-300 mb-1">AI 인식 참고값</p>
+                    <div className="flex flex-wrap gap-x-4 gap-y-1">
+                      <span>OCR 원문: <b>{prediction.ocrText || '없음'}</b></span>
+                      <span>OCR 정규화: <b>{prediction.ocrNormalized || '없음'}</b></span>
+                      <span>ResNet 참고: <b>{prediction.name || '없음'}{confidence ? ` (${confidence})` : ''}</b></span>
+                    </div>
+                  </div>
+                )}
+                <MedicationCard medication={med} showAddButton />
+              </div>
+            )
+          })}
         </div>
       )}
     </div>
