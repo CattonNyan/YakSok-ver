@@ -69,9 +69,9 @@ export default function MedicationCard({ medication: initialMed, showAddButton }
           </div>
 
           <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between gap-2">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0 flex-1">
-                <h3 className="font-bold text-sage-900 dark:text-sage-50 break-keep leading-snug">{medication.item_name}</h3>
+                <h3 className="font-bold text-sage-900 dark:text-sage-50 break-words [overflow-wrap:anywhere] leading-snug">{medication.item_name}</h3>
                 {medication.entp_name && (
                   <p className="text-xs text-sage-400 mt-0.5">{medication.entp_name}</p>
                 )}
@@ -82,7 +82,7 @@ export default function MedicationCard({ medication: initialMed, showAddButton }
                 )}
               </div>
 
-              <div className="flex items-center gap-1.5 shrink-0">
+              <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-auto">
                 {showAddButton && (
                   <Link
                     href={`/schedule/new?med=${medication.id}`}

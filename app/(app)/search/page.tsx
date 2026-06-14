@@ -508,13 +508,13 @@ export default function SearchPage() {
                     <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
                       <div className="w-[76%] max-w-[430px] aspect-[16/10] rounded-2xl border-[3px] border-blue-500 shadow-[0_0_0_9999px_rgba(0,0,0,0.35)]" />
                     </div>
-                    <div className="absolute top-4 left-4 right-4 pointer-events-none">
-                      <div className="mx-auto w-fit max-w-full rounded-2xl bg-black/55 px-4 py-2 text-center text-white backdrop-blur-sm">
-                        <p className="text-sm font-bold">알약을 파란 박스 안에 맞춰주세요</p>
-                        <p className="mt-0.5 text-xs text-white/80">각인 글자가 선명하게 보이도록 밝은 곳에서 촬영해주세요</p>
+                    <div className="absolute top-2 left-2 right-2 sm:top-4 sm:left-4 sm:right-4 pointer-events-none">
+                      <div className="mx-auto w-fit max-w-full rounded-full sm:rounded-2xl bg-black/55 px-3 py-1.5 sm:px-4 sm:py-2 text-center text-white backdrop-blur-sm">
+                        <p className="text-xs sm:text-sm font-bold">알약을 파란 박스 안에 맞춰주세요</p>
+                        <p className="mt-0.5 hidden sm:block text-xs text-white/80">각인 글자가 선명하게 보이도록 밝은 곳에서 촬영해주세요</p>
                       </div>
                     </div>
-                    <div className="absolute left-4 right-4 bottom-20 pointer-events-none rounded-2xl border border-blue-300/40 bg-blue-500/15 px-3 py-2 text-center text-xs font-medium text-white backdrop-blur-sm">
+                    <div className="absolute left-4 right-4 bottom-20 hidden sm:block pointer-events-none rounded-2xl border border-blue-300/40 bg-blue-500/15 px-3 py-2 text-center text-xs font-medium text-white backdrop-blur-sm">
                       알약 전체와 표면 텍스트가 박스 안에 들어오면 촬영 버튼을 눌러주세요
                     </div>
                     <div className="hidden">
