@@ -106,9 +106,12 @@ export default function SearchPage() {
   const capturePhoto = () => {
     const video = videoRef.current; const canvas = canvasRef.current
     if (!video || !canvas) return
-    canvas.width = video.videoWidth; canvas.height = video.videoHeight
-    canvas.getContext('2d')?.drawImage(video, 0, 0)
-    setCapturedImage(canvas.toDataURL('image/jpeg', 0.85))
+    const maxSize = 1280
+    const scale = Math.min(1, maxSize / Math.max(video.videoWidth, video.videoHeight))
+    canvas.width = Math.round(video.videoWidth * scale)
+    canvas.height = Math.round(video.videoHeight * scale)
+    canvas.getContext('2d')?.drawImage(video, 0, 0, canvas.width, canvas.height)
+    setCapturedImage(canvas.toDataURL('image/jpeg', 0.75))
     stopCamera()
   }
   useEffect(() => () => stopCamera(), [])
@@ -157,6 +160,10 @@ export default function SearchPage() {
         body: JSON.stringify({ image }),
       })
       const data = await res.json()
+      if (!res.ok) {
+        toast.error(data.error ?? '이미지 분석 중 오류가 발생했습니다')
+        return
+      }
       setResults(data.candidates ?? [])
       if (!data.candidates?.length) toast('이미지에서 약을 인식하지 못했습니다', { icon: '📷' })
     } catch { toast.error('이미지 분석 중 오류가 발생했습니다') }
