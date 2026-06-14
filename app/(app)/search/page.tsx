@@ -106,16 +106,21 @@ export default function SearchPage() {
   const capturePhoto = () => {
     const video = videoRef.current; const canvas = canvasRef.current
     if (!video || !canvas) return
-    const maxSize = 900
+    const maxSize = 640
     const scale = Math.min(1, maxSize / Math.max(video.videoWidth, video.videoHeight))
     canvas.width = Math.round(video.videoWidth * scale)
     canvas.height = Math.round(video.videoHeight * scale)
     canvas.getContext('2d')?.drawImage(video, 0, 0, canvas.width, canvas.height)
-    setCapturedImage(canvas.toDataURL('image/jpeg', 0.65))
+    setCapturedImage(canvas.toDataURL('image/jpeg', 0.55))
     stopCamera()
   }
   useEffect(() => () => stopCamera(), [])
   useEffect(() => { if (mode !== 'image') stopCamera() }, [mode])
+
+  const dataUrlToBlob = async (dataUrl: string) => {
+    const response = await fetch(dataUrl)
+    return response.blob()
+  }
 
   const handleTextSearch = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -156,10 +161,11 @@ export default function SearchPage() {
     try {
       const controller = new AbortController()
       const timeoutId = window.setTimeout(() => controller.abort(), 45_000)
+      const formData = new FormData()
+      formData.append('image', await dataUrlToBlob(image), 'pill-photo.jpg')
       const res = await fetch('/api/medications/image-search', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image }),
+        body: formData,
         signal: controller.signal,
       })
       window.clearTimeout(timeoutId)

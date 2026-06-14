@@ -40,6 +40,27 @@ async function findMedication(supabase: Awaited<ReturnType<typeof createClient>>
   return null
 }
 
+async function readImageFromRequest(request: Request) {
+  const contentType = request.headers.get('content-type') ?? ''
+
+  if (contentType.includes('multipart/form-data')) {
+    const formData = await request.formData()
+    const imageValue = formData.get('image')
+
+    if (typeof imageValue === 'string') return imageValue
+    if (imageValue && typeof imageValue === 'object' && 'arrayBuffer' in imageValue) {
+      const imageFile = imageValue as File
+      const buffer = Buffer.from(await imageFile.arrayBuffer())
+      return `data:${imageFile.type || 'image/jpeg'};base64,${buffer.toString('base64')}`
+    }
+
+    return null
+  }
+
+  const body = await request.json()
+  return typeof body?.image === 'string' ? body.image : null
+}
+
 export async function GET() {
   const apiUrl = process.env.PILL_IMAGE_API_URL
   const apiKey = process.env.PILL_IMAGE_API_KEY
@@ -88,7 +109,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const { image } = await request.json()
+    const image = await readImageFromRequest(request)
     if (!image) return NextResponse.json({ candidates: [] }, { status: 400 })
 
     const [, base64Data] = image.split(',')
