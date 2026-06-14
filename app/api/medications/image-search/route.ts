@@ -40,6 +40,52 @@ async function findMedication(supabase: Awaited<ReturnType<typeof createClient>>
   return null
 }
 
+export async function GET() {
+  const apiUrl = process.env.PILL_IMAGE_API_URL
+  const apiKey = process.env.PILL_IMAGE_API_KEY
+
+  if (!apiUrl) {
+    return NextResponse.json({
+      ok: false,
+      configured: false,
+      hasApiKey: Boolean(apiKey),
+      error: 'PILL_IMAGE_API_URL is not set',
+    }, { status: 500 })
+  }
+
+  const baseUrl = normalizeApiUrl(apiUrl)
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), 10_000)
+
+  try {
+    const healthRes = await fetch(`${baseUrl}/health`, {
+      headers: apiKey ? { 'X-API-Key': apiKey } : {},
+      signal: controller.signal,
+    })
+    const body = await healthRes.text()
+
+    return NextResponse.json({
+      ok: healthRes.ok,
+      configured: true,
+      hasApiKey: Boolean(apiKey),
+      apiBase: baseUrl,
+      status: healthRes.status,
+      health: body ? JSON.parse(body) : null,
+    }, { status: healthRes.ok ? 200 : 502 })
+  } catch (error) {
+    console.error('Pill image health check failed:', error)
+    return NextResponse.json({
+      ok: false,
+      configured: true,
+      hasApiKey: Boolean(apiKey),
+      apiBase: baseUrl,
+      error: 'Pill image API health check failed',
+    }, { status: 504 })
+  } finally {
+    clearTimeout(timeoutId)
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const { image } = await request.json()

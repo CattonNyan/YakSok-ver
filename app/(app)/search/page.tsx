@@ -106,12 +106,12 @@ export default function SearchPage() {
   const capturePhoto = () => {
     const video = videoRef.current; const canvas = canvasRef.current
     if (!video || !canvas) return
-    const maxSize = 1280
+    const maxSize = 900
     const scale = Math.min(1, maxSize / Math.max(video.videoWidth, video.videoHeight))
     canvas.width = Math.round(video.videoWidth * scale)
     canvas.height = Math.round(video.videoHeight * scale)
     canvas.getContext('2d')?.drawImage(video, 0, 0, canvas.width, canvas.height)
-    setCapturedImage(canvas.toDataURL('image/jpeg', 0.75))
+    setCapturedImage(canvas.toDataURL('image/jpeg', 0.65))
     stopCamera()
   }
   useEffect(() => () => stopCamera(), [])
@@ -154,19 +154,30 @@ export default function SearchPage() {
     if (!image) return
     setLoading(true); setResults([])
     try {
+      const controller = new AbortController()
+      const timeoutId = window.setTimeout(() => controller.abort(), 45_000)
       const res = await fetch('/api/medications/image-search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ image }),
+        signal: controller.signal,
       })
-      const data = await res.json()
+      window.clearTimeout(timeoutId)
+      const text = await res.text()
+      const data = text ? JSON.parse(text) : {}
       if (!res.ok) {
-        toast.error(data.error ?? '이미지 분석 중 오류가 발생했습니다')
+        toast.error(data.error ?? `이미지 분석 요청이 실패했습니다. (HTTP ${res.status})`)
         return
       }
       setResults(data.candidates ?? [])
       if (!data.candidates?.length) toast('이미지에서 약을 인식하지 못했습니다', { icon: '📷' })
-    } catch { toast.error('이미지 분석 중 오류가 발생했습니다') }
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        toast.error('이미지 분석 요청 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.')
+      } else {
+        toast.error('이미지 분석 요청을 처리하지 못했습니다. 배포 환경변수와 네트워크 상태를 확인해주세요.')
+      }
+    }
     setLoading(false)
   }
 
@@ -374,6 +385,7 @@ export default function SearchPage() {
                   }}
                 />
                 <button
+                  type="button"
                   onClick={() => imagePreview && handleImageSearch(imagePreview)}
                   disabled={!imagePreview || loading}
                   className="w-full flex items-center justify-center gap-2 bg-mint-500 hover:bg-mint-600 text-white font-semibold py-3.5 rounded-2xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed shadow-md shadow-mint-500/20"
@@ -398,6 +410,7 @@ export default function SearchPage() {
                         <p className="text-xs text-sage-400 mt-1 leading-relaxed">카메라로 알약을 박스 안에 맞춰 찍으면<br />AI가 약을 찾아드립니다</p>
                       </div>
                       <button
+                        type="button"
                         onClick={startCamera}
                         className="inline-flex items-center gap-2 bg-mint-500 hover:bg-mint-600 text-white font-semibold text-sm px-5 py-2.5 rounded-2xl transition-colors shadow-md shadow-mint-500/20"
                       >
@@ -435,6 +448,7 @@ export default function SearchPage() {
                       </div>
                     </div>
                     <button
+                      type="button"
                       onClick={capturePhoto}
                       aria-label="알약 사진 촬영"
                       className="absolute bottom-4 left-1/2 z-10 h-14 w-14 -translate-x-1/2 rounded-full border-[4px] border-blue-500 bg-white shadow-lg ring-4 ring-white/30 transition-transform hover:scale-105 active:scale-95"
@@ -446,6 +460,7 @@ export default function SearchPage() {
                   <div className="relative rounded-2xl overflow-hidden" style={{ aspectRatio: '4/3' }}>
                     <img src={capturedImage} alt="촬영된 약" className="w-full h-full object-cover" />
                     <button
+                      type="button"
                       onClick={() => { setCapturedImage(null); startCamera() }}
                       className="absolute top-2 right-2 bg-white/90 dark:bg-sage-800/90 text-sage-600 dark:text-sage-300 rounded-full p-1.5 shadow"
                     >
@@ -458,12 +473,13 @@ export default function SearchPage() {
                 )}
 
                 {cameraActive && (
-                  <button onClick={stopCamera} className="w-full py-2 text-sm text-sage-400 hover:text-sage-600 dark:hover:text-sage-300 transition-colors">
+                  <button type="button" onClick={stopCamera} className="w-full py-2 text-sm text-sage-400 hover:text-sage-600 dark:hover:text-sage-300 transition-colors">
                     취소
                   </button>
                 )}
                 {capturedImage && (
                   <button
+                    type="button"
                     onClick={() => handleImageSearch(capturedImage)}
                     disabled={loading}
                     className="w-full flex items-center justify-center gap-2 bg-mint-500 hover:bg-mint-600 text-white font-semibold py-3.5 rounded-2xl transition-colors shadow-md shadow-mint-500/20 disabled:opacity-50"
