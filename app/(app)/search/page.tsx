@@ -600,9 +600,6 @@ export default function SearchPage() {
           <p className="text-sm font-semibold text-sage-500 dark:text-sage-400 px-1">검색 결과 <span className="text-mint-600 dark:text-mint-400">{results.length}개</span></p>
           {results.map(med => {
             const prediction = med.image_prediction
-            const confidence = typeof prediction?.confidence === 'number'
-              ? `${Math.round(prediction.confidence * 100)}%`
-              : undefined
 
             return (
               <div key={med.id} className="space-y-2">
@@ -612,7 +609,6 @@ export default function SearchPage() {
                     <div className="flex flex-wrap gap-x-4 gap-y-1">
                       <span>OCR 원문: <b>{prediction.ocrText || '없음'}</b></span>
                       <span>OCR 정규화: <b>{prediction.ocrNormalized || '없음'}</b></span>
-                      <span>ResNet 참고: <b>{prediction.name || '없음'}{confidence ? ` (${confidence})` : ''}</b></span>
                     </div>
                   </div>
                 )}

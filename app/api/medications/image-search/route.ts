@@ -24,7 +24,7 @@ function predictionTerms(candidate: ImageCandidate) {
     .map(value => value.trim())
 }
 
-async function findMedication(supabase: Awaited<ReturnType<typeof createClient>>, term: string) {
+async function findMedications(supabase: Awaited<ReturnType<typeof createClient>>, term: string, limit = 5) {
   const imprintColumns = ['print_front', 'print_back', 'mark_code_front', 'mark_code_back']
   const searchColumns = ['item_name', ...imprintColumns]
   const trimmedTerm = term.trim()
@@ -35,21 +35,21 @@ async function findMedication(supabase: Awaited<ReturnType<typeof createClient>>
       .from('medications')
       .select(MEDICATION_COLUMNS)
       .ilike(column, trimmedTerm)
-      .limit(1)
+      .limit(limit)
 
-    if (data?.[0]) return data[0]
+    if (data?.length) return data
   }
 
-  if (isShortImprint) return null
+  if (isShortImprint) return []
 
   for (const pattern of [trimmedTerm, `${trimmedTerm}%`, `%${trimmedTerm}%`]) {
     const { data } = await supabase
       .from('medications')
       .select(MEDICATION_COLUMNS)
       .ilike('item_name', pattern)
-      .limit(1)
+      .limit(limit)
 
-    if (data?.[0]) return data[0]
+    if (data?.length) return data
   }
 
   for (const column of searchColumns) {
@@ -57,12 +57,12 @@ async function findMedication(supabase: Awaited<ReturnType<typeof createClient>>
       .from('medications')
       .select(MEDICATION_COLUMNS)
       .ilike(column, `%${trimmedTerm}%`)
-      .limit(1)
+      .limit(limit)
 
-    if (data?.[0]) return data[0]
+    if (data?.length) return data
   }
 
-  return null
+  return []
 }
 
 async function readImageSearchPayload(request: Request) {
@@ -212,25 +212,30 @@ export async function POST(request: Request) {
 
     for (const candidate of imageCandidates.slice(0, 5)) {
       const terms = predictionTerms(candidate)
-      let matchedMedication: any = null
+      let matchedMedications: any[] = []
 
       for (const term of terms) {
-        matchedMedication = await findMedication(supabase, term)
-        if (matchedMedication) {
+        matchedMedications = await findMedications(supabase, term, 5 - results.length)
+        if (matchedMedications.length > 0) {
           break
         }
       }
 
-      const key = matchedMedication?.id ?? candidate.code ?? candidate.name
-      if (!key || seen.has(key)) continue
-      seen.add(key)
-
-      if (matchedMedication) {
-        results.push({
-          ...matchedMedication,
-          image_prediction: candidate,
-        })
-      } else {
+      if (matchedMedications.length > 0) {
+        for (const matchedMedication of matchedMedications) {
+          const key = matchedMedication?.id ?? matchedMedication?.item_seq
+          if (!key || seen.has(key)) continue
+          seen.add(key)
+          results.push({
+            ...matchedMedication,
+            image_prediction: candidate,
+          })
+          if (results.length >= 5) break
+        }
+      } else if (results.length === 0) {
+        const key = candidate.code ?? candidate.name
+        if (!key || seen.has(key)) continue
+        seen.add(key)
         results.push({
           id: crypto.randomUUID(),
           item_name: candidate.name ?? candidate.ocrText ?? '알 수 없는 알약',
@@ -240,6 +245,8 @@ export async function POST(request: Request) {
           image_prediction: candidate,
         })
       }
+
+      if (results.length >= 5) break
     }
 
     return NextResponse.json({ candidates: results })
